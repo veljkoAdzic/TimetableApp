@@ -1,7 +1,7 @@
 import { View, SafeAreaView, Text, StyleSheet } from 'react-native'
+import EventBlock from './EventBlock'
 
 const edngeCases = (i: number, j: number) => {
-    
     let res = {
         borderTopWidth: 0,
         borderRightWidth: 0
@@ -15,7 +15,18 @@ const edngeCases = (i: number, j: number) => {
     return res
 }
 
-export default function Grid(props: any){
+interface GridProps extends React.ComponentProps<typeof View> {
+    events: {
+        title: string,
+        day: string,
+        startTime: number[],
+        endTime: number[],
+        location: string,
+        extra_descriptions?: string[]
+    }[]
+}
+
+export default function Grid(props: GridProps){
     return (
         <View>
         <View style={styles.container}>
@@ -24,7 +35,7 @@ export default function Grid(props: any){
                 <View key ={i} style={styles.rowContainer}>
                     {Array.from({length: 5}).map( (__, j) => (
                         
-                        <View key={i*5+j} style={[styles.block, edngeCases(i, j)]}></View>
+                        <View key={i*5+j} style={[styles.block, edngeCases(i, j)]} />
                         
                     )
                     )}
@@ -35,10 +46,11 @@ export default function Grid(props: any){
             
         </View>
 
-        { // events (TBA)
-            <View style={styles.event}>
-                <Text>{`Mat 3\nPED AMF`}</Text>
-            </View>
+        { // events
+            props.events.map( (item, index) => (
+                <EventBlock key={65+index} data={item} />
+            ) )
+
         }
         </View>
     )
@@ -62,14 +74,5 @@ const styles = StyleSheet.create({
         borderLeftWidth: 1,
         borderBottomWidth: 1
     },
-    event: {
-        backgroundColor: 'rgb(220, 180, 50)',
-        textAlignVertical: 'center',
-
-        width: '20%',
-        height: `${100/13*2.75}%`,
-        position: 'absolute',
-        left: '0%',
-        top: '0%'
-    }
+    
 })
