@@ -1,4 +1,6 @@
 import { View, Text, StyleSheet } from 'react-native'
+import { EventColors } from '@/constants/EventColors'
+
 
 interface EventData {
         title: string,
@@ -9,12 +11,10 @@ interface EventData {
         extra_descriptions?: string[]
     
 }
-
 interface EventBlockProps extends React.ComponentProps<typeof View> {
     data: EventData
 }
 
-const colours = [ '#faca50', '#3067e6', '#32b82e', '#9e2220']
 const days = [ 'MON', 'TUE', 'WED', 'THU', "FRI", 'SAT', 'SUN']
 
 const findDimensions = (data: EventData) => {
@@ -57,13 +57,32 @@ const findDimensions = (data: EventData) => {
 
 }
 
+const getColorTheme = (location: string) => {
+
+    let hash = 0;
+    for(let i = 0; i < location.length; i++)
+        hash += location.charCodeAt(i)
+
+    hash = hash % EventColors.length;
+
+    return EventColors[hash]
+
+}
+
 export default function EventBlock(props: EventBlockProps){
+
+    let theme = getColorTheme(props.data.location)
+
     return (
         
         <>
-        <View style={StyleSheet.flatten([ styles.event, findDimensions(props.data)])}>
-                <Text>{props.data.title}</Text>
-                <Text>{props.data.location}</Text>
+        <View style={ StyleSheet.flatten([ 
+            styles.event, 
+            findDimensions(props.data), 
+            {backgroundColor: theme.background, borderColor: theme.border}
+            ]) }>
+                <Text style={{color: theme.text}}>{props.data.title}</Text>
+                <Text style={{fontSize: 10, color: (theme.text + 'AF')}}>{props.data.location}</Text>
             </View>
         </>
     )
@@ -71,12 +90,14 @@ export default function EventBlock(props: EventBlockProps){
 
 const styles = StyleSheet.create({
     event: {
-        backgroundColor: 'rgb(220, 180, 50)',
+        backgroundColor: 'coral',   //default
         textAlignVertical: 'center',
 
         width: '20%',
         position: 'absolute',
 
-        borderRadius: 5
+        borderRadius: 5,
+        borderWidth: 2,
+        borderColor: '#FFFFFF01' //default
     }
 })

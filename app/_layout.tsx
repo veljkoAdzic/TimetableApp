@@ -16,10 +16,10 @@ import Index from './index';
 
 export default function RootLayout() {
   return (
-    // <Stack>
-    //   <Stack.Screen name="index" options={{ title: 'Home' }} />
-    // </Stack>
-    <Index />
+    <Stack>
+      <Stack.Screen name="index" options={{ title: 'Home' }} />
+    </Stack>
+    // <Index />
   )
 }
   // const colorScheme = useColorScheme();

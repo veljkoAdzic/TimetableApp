@@ -33,7 +33,7 @@ const events_data = [
         day: 'MON',
         startTime: [15, 30],
         endTime: [17, 0],
-        location: "AMF PED",
+        location: "215",
         extra_descriptions: ["labs"]
     },
 
@@ -81,6 +81,55 @@ const events_data = [
         location: "223",
         extra_descriptions: ["Asis b"]
     },
+
+    {
+        title: "Digitizacija",
+        day: 'FRI',
+        startTime: [12, 0],
+        endTime: [13, 45],
+        location: "FINKI AMF G",
+        extra_descriptions: ["Asis b"]
+    },
+    {
+        title: "Digitizacija",
+        day: 'FRI',
+        startTime: [14, 0],
+        endTime: [15, 45],
+        location: "FINKI AMF G",
+        extra_descriptions: ["Prof c"]
+    },
+    {
+        title: "IPKS",
+        day: 'THU',
+        startTime: [12, 30],
+        endTime: [14, 0],
+        location: "138",
+        extra_descriptions: ["labs"]
+    },
+    {
+        title: "KMB",
+        day: 'THU',
+        startTime: [14, 0],
+        endTime: [15, 45],
+        location: "PED AMF",
+        extra_descriptions: ["asis d"]
+    },
+    {
+        title: "APS",
+        day: 'THU',
+        startTime: [16, 0],
+        endTime: [17, 45],
+        location: "PED AMF",
+        extra_descriptions: ["prof d"]
+    },
+    {
+        title: "APS",
+        day: 'THU',
+        startTime: [18, 0],
+        endTime: [19, 45],
+        location: "PED AMF",
+        extra_descriptions: ["asis d"]
+    },
 ]
 
 function SideBar(){
@@ -88,7 +137,7 @@ function SideBar(){
         <View>
             { Array.from({length: 13}).map( (_, index) => (
                 <View key={index} style={styles.timeSlots}>
-                    <Text style={{fontSize: 12}}> {index+8}:00</Text>
+                    <Text style={styles.timedisplay}> { `${(index < 2)?'0':''}${index+8}` }:00</Text>
                 </View>
             )
             )}
@@ -97,11 +146,13 @@ function SideBar(){
 }
 
 export default function TimetableDisplay(props: any){
-    let numOfDays = 5
-
+    const days = ['Pon', 'Vto', 'Sre', 'Cet', 'Pet']
     return (
+
         <View style={styles.ttContainer}>
+            
             <SideBar />
+            
             <View style={styles.gridContainer}>
                 <Grid events={events_data} />
             </View>
@@ -112,23 +163,41 @@ export default function TimetableDisplay(props: any){
 const styles = StyleSheet.create({
     ttContainer:{
         flex: 1,
-        flexDirection: 'row'
+        flexDirection: 'row',
+        flexWrap: 'wrap'
     },
     sideBar: {
         backgroundColor: '#FF8012',
-        // flex: 1
         width: 80
-
     },
     timeSlots: {
         height: `${100/13}%`,
-        // justifyContent: 'center',
-        alignItems: 'center'
+        alignItems: 'center',
+        borderBottomWidth: 1,
+        borderBottomColor: '#EEE3'
     },
+    timedisplay: {
+        fontSize: 10,
+        paddingRight: 2,
+        color: '#AAA' 
+    },
+
     gridContainer: {
         flex: 1,
         flexDirection: 'row',
         alignItems: 'stretch'
+    },
+    topBar: {
+        // width: '100%',
+        flex: 1,
+        flexDirection: 'row'
+    },
+    topBarText: {
+        color: 'white',
+        flex: 1,
+        // width: '20%',
+        fontSize: 12,
+        backgroundColor: 'pink', //test
     }
 
 })

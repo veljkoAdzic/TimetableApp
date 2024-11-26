@@ -29,29 +29,25 @@ interface GridProps extends React.ComponentProps<typeof View> {
 export default function Grid(props: GridProps){
     return (
         <View>
-        <View style={styles.container}>
-            { Array.from({length: 13}).map( (_, i) => (
-                
-                <View key ={i} style={styles.rowContainer}>
-                    {Array.from({length: 5}).map( (__, j) => (
-                        
-                        <View key={i*5+j} style={[styles.block, edngeCases(i, j)]} />
-                        
-                    )
-                    )}
-                </View>
-            )
-            )}
+            <View style={styles.container}>
+                { 
+                // creating the grid
+                Array.from({length: 13}).map( (_, i) => (  
+                    <View key ={i} style={styles.rowContainer}>
+                        {Array.from({length: 5}).map( (__, j) => (
+                            <View key={i*5+j} style={[styles.block, edngeCases(i, j)]} />
+                        ) )}
+                    </View>
+                ) )
+                } 
+            </View>
 
-            
-        </View>
-
-        { // events
+            {
+            // Loading events
             props.events.map( (item, index) => (
-                <EventBlock key={65+index} data={item} />
+                <EventBlock key={index} data={item} />
             ) )
-
-        }
+            }
         </View>
     )
 }
@@ -60,7 +56,6 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
     },
-
     rowContainer: {
         flex: 1,
         flexDirection: 'row',
@@ -70,9 +65,8 @@ const styles = StyleSheet.create({
     },
     block: {        
         width: '20%',
-        borderColor: '#1115',
+        borderColor: '#EEE3',
         borderLeftWidth: 1,
         borderBottomWidth: 1
-    },
-    
+    }
 })

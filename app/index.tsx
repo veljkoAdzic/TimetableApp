@@ -15,6 +15,7 @@ export default function Index() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        maxWidth: '100%'
+        maxWidth: '100%',
+        backgroundColor: '#202020'
     }
 })
