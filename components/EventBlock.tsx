@@ -26,7 +26,7 @@ const findDimensions = (data: EventData) => {
     }
 
     // Left position
-    let day = days.findIndex( (d) => d === data.day);
+    let day = days.findIndex( (d) => d.toUpperCase() === data.day);
     if( day == -1){
         console.error("[findDimensions]: Invalid 'day' paramater -> " + data.day)
     }else{
@@ -58,74 +58,50 @@ const findDimensions = (data: EventData) => {
 
 }
 
-const getColorTheme = (location: string) => {
-
-    let hash = 0;
-    for(let i = 0; i < location.length; i++)
-        hash += location.charCodeAt(i)
-
-    hash = hash % EventColors.length;
-
-    return EventColors[hash]
-
+const ThemeMap = new Map<string, EventColorsType>();
+const getTheme = (location: string) => {
+    if(!ThemeMap.has(location)){
+        const index = ThemeMap.size % EventColors.length
+        ThemeMap.set(location, EventColors[index])
+    }
+    return ThemeMap.get(location)! // ! is so that null is not returned
 }
 
 export default function EventBlock(props: EventBlockProps){
     const [theme, setTheme] = useState<EventColorsType>(EventColors[0])
 
-    const storeData = async (key: string, value: number) => {
+    const storeData = async (key: string, data: string) => {
         try{
-            await AsyncStorage.setItem(key, `${value}`)
-        } catch (err){
-            alert(err)
+            await AsyncStorage.setItem(key, data)
+        } catch(err) {
+            alert(`[storeData]: ${err}`)
         }
     }
-
     const loadData = async (key: string) => {
         try{
-            const value = await AsyncStorage.getItem(key)
-            return value
-        }catch (err){
-            alert(err)
-            return null
+            let result = await AsyncStorage.getItem(key)
+            return result;
+        } catch(err) {
+            alert(`[loadData]: ${err}`)
         }
     }
 
-    const initializeColor = async () => {
-        const index = await loadData(props.data.location)
+    const loadThemeMap = async (map: Map<any, any>) => {
+        const storedMap = await loadData('ThemeMap')
+        if(!storedMap) return // not stored
 
-        console.log(props.data.location + " | " + index) // test
-
-        if(index){
-            console.log(`used colour! ${index}`) // test
-            const i = parseInt(index)
-            setTheme(EventColors[i])
-        } else {
-            const latest = await loadData('latest')
-            const latestIndex = (latest) ? parseInt(latest) : -1
-            const next = (latestIndex+1) % EventColors.length
-            
-            console.log(latest, latestIndex, next) // test
-
-            await storeData(props.data.location, next)
-            await storeData('latest', next)
-            setTheme(EventColors[next])
-        }
+        JSON.parse(storedMap).forEach((entry: [any, any], _: number) => {
+            map.set(entry[0], entry[1])
+        });        
     }
-    
-    const debugStorage = async () => {
-        const keys = await AsyncStorage.getAllKeys();
-        const entries = await AsyncStorage.multiGet(keys);
-        console.log('[AsyncStorage State]', Object.fromEntries(entries));
-    };
 
     useEffect(() => {
-        debugStorage();
-        initializeColor();
+        loadThemeMap(ThemeMap)
+        setTheme( getTheme(props.data.location) )
+        storeData('ThemeMap', JSON.stringify([...ThemeMap]))
       }, []);
 
     return (
-        
         <>
         <View style={ StyleSheet.flatten([ 
             styles.event, 

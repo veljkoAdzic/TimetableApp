@@ -65,7 +65,7 @@ const styles = StyleSheet.create({
     },
     block: {        
         width: '20%',
-        borderColor: '#EEE3',
+        borderColor: '#8883',
         borderLeftWidth: 1,
         borderBottomWidth: 1
     }

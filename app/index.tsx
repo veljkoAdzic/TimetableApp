@@ -18,6 +18,6 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         maxWidth: '100%',
-        backgroundColor: '#202020'
+        backgroundColor: '#F0F0F0'
     }
 })

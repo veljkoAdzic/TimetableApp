@@ -112,7 +112,7 @@ const events_data = [
         day: 'THU',
         startTime: [14, 0],
         endTime: [15, 45],
-        location: "PED AMF",
+        location: "AMF PED",
         extra_descriptions: ["asis d"]
     },
     {
@@ -120,7 +120,7 @@ const events_data = [
         day: 'THU',
         startTime: [16, 0],
         endTime: [17, 45],
-        location: "PED AMF",
+        location: "AMF PED",
         extra_descriptions: ["prof d"]
     },
     {
@@ -128,7 +128,7 @@ const events_data = [
         day: 'THU',
         startTime: [18, 0],
         endTime: [19, 45],
-        location: "PED AMF",
+        location: "AMF PED",
         extra_descriptions: ["asis d"]
     },
 ]
@@ -176,7 +176,7 @@ const styles = StyleSheet.create({
         height: `${100/13}%`,
         alignItems: 'center',
         borderBottomWidth: 1,
-        borderBottomColor: '#EEE3'
+        borderBottomColor: '#8883'
     },
     timedisplay: {
         fontSize: 10,
