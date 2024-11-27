@@ -1,6 +1,7 @@
 import { View, Text, StyleSheet } from 'react-native'
 import  Grid  from '@/components/Grid'
-
+import { useEffect } from 'react'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 const events_data = [
     {
         title: "Matematika 3",
@@ -147,6 +148,7 @@ function SideBar(){
 
 export default function TimetableDisplay(props: any){
     const days = ['Pon', 'Vto', 'Sre', 'Cet', 'Pet']
+
     return (
 
         <View style={styles.ttContainer}>

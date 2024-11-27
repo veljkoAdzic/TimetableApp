@@ -1,25 +1,33 @@
+const transparentBorder = '#00000001';
+
 export const EventColors = [
     { //yellow
         background: '#ebd82d',
-        border: '#ebb82d01',
-        text: '#000000'
+        border: transparentBorder,
+        text: 'black'
     },
 
     { //blue
         background: '#4976de',
-        border: '#3c45c201',
-        text: '#FFFFFF'
+        border: transparentBorder,
+        text: 'white'
     },
 
     { //green
         background: '#47c443',
-        border: '#419c2f01',
-        text: '#000000'
+        border: transparentBorder,
+        text: 'black'
     },
 
     { //red
         background: '#db4644',
-        border: '#bf393701',
-        text: '#000000'
+        border: transparentBorder,
+        text: 'black'
     }
 ]
+
+export interface EventColorsType {
+    background: string,
+    border: string,
+    text: string
+}

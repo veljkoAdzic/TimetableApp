@@ -1,6 +1,7 @@
 import { View, Text, StyleSheet } from 'react-native'
-import { EventColors } from '@/constants/EventColors'
-
+import { EventColors, EventColorsType } from '@/constants/EventColors'
+import AsyncStorage from '@react-native-async-storage/async-storage'
+import { useState, useEffect } from 'react'
 
 interface EventData {
         title: string,
@@ -70,8 +71,58 @@ const getColorTheme = (location: string) => {
 }
 
 export default function EventBlock(props: EventBlockProps){
+    const [theme, setTheme] = useState<EventColorsType>(EventColors[0])
 
-    let theme = getColorTheme(props.data.location)
+    const storeData = async (key: string, value: number) => {
+        try{
+            await AsyncStorage.setItem(key, `${value}`)
+        } catch (err){
+            alert(err)
+        }
+    }
+
+    const loadData = async (key: string) => {
+        try{
+            const value = await AsyncStorage.getItem(key)
+            return value
+        }catch (err){
+            alert(err)
+            return null
+        }
+    }
+
+    const initializeColor = async () => {
+        const index = await loadData(props.data.location)
+
+        console.log(props.data.location + " | " + index) // test
+
+        if(index){
+            console.log(`used colour! ${index}`) // test
+            const i = parseInt(index)
+            setTheme(EventColors[i])
+        } else {
+            const latest = await loadData('latest')
+            const latestIndex = (latest) ? parseInt(latest) : -1
+            const next = (latestIndex+1) % EventColors.length
+            
+            console.log(latest, latestIndex, next) // test
+
+            await storeData(props.data.location, next)
+            await storeData('latest', next)
+            setTheme(EventColors[next])
+        }
+    }
+    
+    const debugStorage = async () => {
+        const keys = await AsyncStorage.getAllKeys();
+        const entries = await AsyncStorage.multiGet(keys);
+        console.log('[AsyncStorage State]', Object.fromEntries(entries));
+    };
+
+    useEffect(() => {
+        debugStorage();
+        initializeColor();
+      }, []);
 
     return (
         
@@ -82,7 +133,7 @@ export default function EventBlock(props: EventBlockProps){
             {backgroundColor: theme.background, borderColor: theme.border}
             ]) }>
                 <Text style={{color: theme.text}}>{props.data.title}</Text>
-                <Text style={{fontSize: 10, color: (theme.text + 'AF')}}>{props.data.location}</Text>
+                <Text style={{fontSize: 10, color: theme.text, opacity: 0.5}}>{props.data.location}</Text>
             </View>
         </>
     )
@@ -97,7 +148,7 @@ const styles = StyleSheet.create({
         position: 'absolute',
 
         borderRadius: 5,
-        borderWidth: 2,
+        borderWidth: 1.5,
         borderColor: '#FFFFFF01' //default
     }
 })

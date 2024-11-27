@@ -3,9 +3,11 @@ import { Link } from 'expo-router'
 
 // import Grid from '@/components/Grid'
 import TimetableDisplay from '@/components/TimetableDisplay'
+import { useEffect } from 'react'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 
 export default function Index() {
-    return (
+        return (
         <View style={styles.container} >
             <TimetableDisplay />
         </View>

@@ -6,19 +6,19 @@
 // import { useEffect } from 'react';
 // import 'react-native-reanimated';
 
-import  { Stack } from 'expo-router';
+import  { Stack, useNavigation } from 'expo-router';
 import Index from './index';
-
-// import { useColorScheme } from '@/hooks/useColorScheme';
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 // SplashScreen.preventAutoHideAsync();
+
 
 export default function RootLayout() {
   return (
     <Stack>
       <Stack.Screen name="index" options={{ title: 'Home' }} />
     </Stack>
+
     // <Index />
   )
 }
