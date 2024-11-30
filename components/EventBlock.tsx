@@ -1,17 +1,9 @@
 import { View, Text, StyleSheet } from 'react-native'
 import { EventColors, EventColorsType } from '@/constants/EventColors'
-import AsyncStorage from '@react-native-async-storage/async-storage'
+import { loadData, storeData } from '../utils/localStorage'
 import { useState, useEffect } from 'react'
+import { EventData } from '../constants/EventTypes'
 
-interface EventData {
-        title: string,
-        day: string,
-        startTime: number[],
-        endTime: number[],
-        location: string,
-        extra_descriptions?: string[]
-    
-}
 interface EventBlockProps extends React.ComponentProps<typeof View> {
     data: EventData
 }
@@ -58,6 +50,34 @@ const findDimensions = (data: EventData) => {
 
 }
 
+const formatTitle = (title: string) => {
+    title.trim()
+    const maxLen = 9
+    if(title.length <= maxLen) //can fit as is
+        return title
+    const fragments = title.split(/\W/)
+    let res = ""
+
+    if(fragments.length <= 3){
+        fragments.forEach( (f, _) => {
+            res += f.substring(0, 3) + " "
+        })
+
+        res.trimEnd()
+
+        if(res.length <= maxLen)
+            return res
+    }
+
+    res = ""
+    fragments.forEach( (f, _) => {
+        res += f.charAt(0)
+    })
+
+    
+    return res
+}
+
 const ThemeMap = new Map<string, EventColorsType>();
 const getTheme = (location: string) => {
     if(!ThemeMap.has(location)){
@@ -70,21 +90,6 @@ const getTheme = (location: string) => {
 export default function EventBlock(props: EventBlockProps){
     const [theme, setTheme] = useState<EventColorsType>(EventColors[0])
 
-    const storeData = async (key: string, data: string) => {
-        try{
-            await AsyncStorage.setItem(key, data)
-        } catch(err) {
-            alert(`[storeData]: ${err}`)
-        }
-    }
-    const loadData = async (key: string) => {
-        try{
-            let result = await AsyncStorage.getItem(key)
-            return result;
-        } catch(err) {
-            alert(`[loadData]: ${err}`)
-        }
-    }
 
     const loadThemeMap = async (map: Map<any, any>) => {
         const storedMap = await loadData('ThemeMap')
@@ -108,7 +113,7 @@ export default function EventBlock(props: EventBlockProps){
             findDimensions(props.data), 
             {backgroundColor: theme.background, borderColor: theme.border}
             ]) }>
-                <Text style={{color: theme.text}}>{props.data.title}</Text>
+                <Text style={{color: theme.text}}>{formatTitle(props.data.title)}</Text>
                 <Text style={{fontSize: 10, color: theme.text, opacity: 0.5}}>{props.data.location}</Text>
             </View>
         </>

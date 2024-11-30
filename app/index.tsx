@@ -2,14 +2,14 @@ import { View, Text, StyleSheet } from 'react-native'
 import { Link } from 'expo-router'
 
 // import Grid from '@/components/Grid'
-import TimetableDisplay from '@/components/TimetableDisplay'
+import TimetableScreen from '@/screens/TimetableScreen'
 import { useEffect } from 'react'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 
 export default function Index() {
         return (
         <View style={styles.container} >
-            <TimetableDisplay />
+            <TimetableScreen />
         </View>
     )
 }

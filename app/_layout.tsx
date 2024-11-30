@@ -6,8 +6,11 @@
 // import { useEffect } from 'react';
 // import 'react-native-reanimated';
 
-import  { Stack, useNavigation } from 'expo-router';
-import Index from './index';
+// import  { Stack, useNavigation } from 'expo-router';
+// import Index from './index';
+
+import { GestureHandlerRootView } from 'react-native-gesture-handler'
+import { Drawer } from 'expo-router/drawer'
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 // SplashScreen.preventAutoHideAsync();
@@ -15,9 +18,17 @@ import Index from './index';
 
 export default function RootLayout() {
   return (
-    <Stack>
-      <Stack.Screen name="index" options={{ title: 'Home' }} />
-    </Stack>
+    // <Stack>
+    //   <Stack.Screen name="index" options={{ title: 'Home' }} />
+    // </Stack>
+
+    <GestureHandlerRootView style={{flex: 1}}>
+      <Drawer>
+        <Drawer.Screen name="index" options={{drawerLabel: 'Timetable', title: 'Weekly Timetable'}}/>
+        <Drawer.Screen name="editor" options={{drawerLabel: 'Edit', title: 'Edit Timetable'}}/>
+        <Drawer.Screen name='about' options={{drawerLabel: 'About', title: 'About Page'}} />
+      </Drawer>
+    </GestureHandlerRootView>
 
     // <Index />
   )

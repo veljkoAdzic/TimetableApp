@@ -1,5 +1,6 @@
 import { View, SafeAreaView, Text, StyleSheet } from 'react-native'
 import EventBlock from './EventBlock'
+import { EventData } from '../constants/EventTypes'
 
 const edngeCases = (i: number, j: number) => {
     let res = {
@@ -16,14 +17,7 @@ const edngeCases = (i: number, j: number) => {
 }
 
 interface GridProps extends React.ComponentProps<typeof View> {
-    events: {
-        title: string,
-        day: string,
-        startTime: number[],
-        endTime: number[],
-        location: string,
-        extra_descriptions?: string[]
-    }[]
+    events: EventData[]
 }
 
 export default function Grid(props: GridProps){

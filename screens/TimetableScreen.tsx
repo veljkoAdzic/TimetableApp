@@ -1,7 +1,7 @@
 import { View, Text, StyleSheet } from 'react-native'
 import  Grid  from '@/components/Grid'
 import { useEffect } from 'react'
-import AsyncStorage from '@react-native-async-storage/async-storage'
+//import AsyncStorage from '@react-native-async-storage/async-storage'
 const events_data = [
     {
         title: "Matematika 3",
@@ -13,7 +13,7 @@ const events_data = [
     },
 
     {
-        title: "KMB",
+        title: "Kompjuterski Mrezi i Bezbednost",
         day: 'MON',
         startTime: [11, 0],
         endTime: [12, 45],
@@ -21,7 +21,7 @@ const events_data = [
         extra_descriptions: ["Prof b"]
     },
     {
-        title: "Dig A",
+        title: "Digitizacija A",
         day: 'MON',
         startTime: [14, 0],
         endTime: [15, 30],
@@ -30,7 +30,7 @@ const events_data = [
     },
 
     {
-        title: "APS",
+        title: "Algoritmi i Podatocni Strukturi",
         day: 'MON',
         startTime: [15, 30],
         endTime: [17, 0],
@@ -39,7 +39,7 @@ const events_data = [
     },
 
     {
-        title: "Mat 3 A",
+        title: "Matematika 3 A",
         day: 'MON',
         startTime: [18, 30],
         endTime: [20, 0],
@@ -48,7 +48,7 @@ const events_data = [
     },
 
     {
-        title: "KMB",
+        title: "Kompjuterski Mrezi i Bezbednost",
         day: 'TUE',
         startTime: [15, 30],
         endTime: [17, 0],
@@ -66,7 +66,7 @@ const events_data = [
     },
 
     {
-        title: "IPKS",
+        title: "Internet Programiranje na Klientska Strana",
         day: 'THU',
         startTime: [10, 0],
         endTime: [11, 45],
@@ -75,7 +75,7 @@ const events_data = [
     },
 
     {
-        title: "IPKS",
+        title: "Internet Programiranje na Klientska Strana",
         day: 'THU',
         startTime: [12, 0],
         endTime: [12, 45],
@@ -100,7 +100,7 @@ const events_data = [
         extra_descriptions: ["Prof c"]
     },
     {
-        title: "IPKS",
+        title: "Internet Programiranje na Klientska Strana",
         day: 'THU',
         startTime: [12, 30],
         endTime: [14, 0],
@@ -108,7 +108,7 @@ const events_data = [
         extra_descriptions: ["labs"]
     },
     {
-        title: "KMB",
+        title: "Kompjuterski Mrezi i Bezbednost",
         day: 'THU',
         startTime: [14, 0],
         endTime: [15, 45],
@@ -116,7 +116,7 @@ const events_data = [
         extra_descriptions: ["asis d"]
     },
     {
-        title: "APS",
+        title: "Algoritmi i Podatocni Strukturi",
         day: 'THU',
         startTime: [16, 0],
         endTime: [17, 45],
@@ -124,7 +124,7 @@ const events_data = [
         extra_descriptions: ["prof d"]
     },
     {
-        title: "APS",
+        title: "Algoritmi i Podatocni Strukturi",
         day: 'THU',
         startTime: [18, 0],
         endTime: [19, 45],
@@ -138,7 +138,7 @@ function SideBar(){
         <View>
             { Array.from({length: 13}).map( (_, index) => (
                 <View key={index} style={styles.timeSlots}>
-                    <Text style={styles.timedisplay}> { `${(index < 2)?'0':''}${index+8}` }:00</Text>
+                    <Text style={styles.timedisplay}> { ` ${(index < 2)?'0':''}${index+8}` }:00</Text>
                 </View>
             )
             )}
@@ -146,15 +146,10 @@ function SideBar(){
     )
 }
 
-export default function TimetableDisplay(props: any){
-    const days = ['Pon', 'Vto', 'Sre', 'Cet', 'Pet']
-
+export default function TimetableScreen(props: any){
     return (
-
         <View style={styles.ttContainer}>
-            
             <SideBar />
-            
             <View style={styles.gridContainer}>
                 <Grid events={events_data} />
             </View>
@@ -188,18 +183,6 @@ const styles = StyleSheet.create({
         flex: 1,
         flexDirection: 'row',
         alignItems: 'stretch'
-    },
-    topBar: {
-        // width: '100%',
-        flex: 1,
-        flexDirection: 'row'
-    },
-    topBarText: {
-        color: 'white',
-        flex: 1,
-        // width: '20%',
-        fontSize: 12,
-        backgroundColor: 'pink', //test
     }
 
 })
