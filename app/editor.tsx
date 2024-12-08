@@ -1,22 +1,31 @@
 import { View, Text, TextInput, Pressable, StyleSheet } from 'react-native'
 import { useState } from 'react'
-import { getData  } from '../utils/timetableData'
+import { isVersionUpToDate  } from '../utils/timetableData'
+import { loadData } from '@/utils/localStorage'
+
 export default function EditorScreen() {
     const [inputValue, setInputValue] = useState('')
 
     return (
         <View style={styles.container} >
             <TextInput 
-            placeholder='http://192.168.100.18:3000/api/' 
+            placeholder='http://192.168.100.18:3000/api' 
             inputMode='url' 
             style={styles.input}
-            onChangeText={ (nextTxt) => setInputValue(nextTxt) }
+            onChangeText={ (nextTxt) => setInputValue(nextTxt.trim()) }
              />
             <Pressable 
-            onPressOut={() =>{
-                console.log("Pressed Button")
-                getData(inputValue.trim() || 'http://192.168.100.18:3000/api/')
-            }}
+            onPressOut={ () =>{
+                isVersionUpToDate(inputValue)
+                .then(utd => {
+                    console.log('[Pressable]: ' + utd)
+                    if(utd){
+                        //local data is up to date
+                    } else {
+                        // update data 
+                    }
+                })
+            } }
             >
                 { ({pressed}) =>
                 <Text style={[styles.button, (pressed) ? styles.buttonActive : styles.buttonPassive]}>Check DB</Text>
