@@ -6,6 +6,12 @@ import { loadData } from '@/utils/localStorage'
 export default function EditorScreen() {
     const [inputValue, setInputValue] = useState('')
 
+    enum loaderStates {
+        inactive,
+        active,
+        finished
+    }
+    const [loader, setLoader] = useState(loaderStates.inactive)
     return (
         <View style={styles.container} >
             <TextInput 
@@ -14,11 +20,20 @@ export default function EditorScreen() {
             style={styles.input}
             onChangeText={ (nextTxt) => setInputValue(nextTxt.trim()) }
              />
+            
+            <Text>{ 
+                (loader == loaderStates.inactive) ? "" : 
+                (loader == loaderStates.active) ? "Loading..." : 
+                "Finished :D" 
+            }</Text>
+            
             <Pressable 
             onPressOut={ () =>{
+                setLoader(loaderStates.active)
                 isVersionUpToDate(inputValue)
                 .then(utd => {
                     console.log('[Pressable]: ' + utd)
+                    setTimeout( () => setLoader(loaderStates.finished), 500)
                     if(utd){
                         //local data is up to date
                     } else {

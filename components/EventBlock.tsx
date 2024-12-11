@@ -50,31 +50,30 @@ const findDimensions = (data: EventData) => {
 
 }
 
-const formatTitle = (title: string) => {
+export function formatTitle(title: string) {
     title.trim()
     const maxLen = 9
-    if(title.length <= maxLen) //can fit as is
+    if (title.length <= maxLen) //can fit as is
         return title
     const fragments = title.split(/\W/)
     let res = ""
 
-    if(fragments.length <= 3){
-        fragments.forEach( (f, _) => {
+    if (fragments.length <= 3) {
+        fragments.forEach((f, _) => {
             res += f.substring(0, 3) + " "
         })
 
         res.trimEnd()
 
-        if(res.length <= maxLen)
+        if (res.length <= maxLen)
             return res
     }
 
     res = ""
-    fragments.forEach( (f, _) => {
+    fragments.forEach((f, _) => {
         res += f.charAt(0)
     })
 
-    
     return res
 }
 

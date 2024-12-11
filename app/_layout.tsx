@@ -26,6 +26,7 @@ export default function RootLayout() {
       <Drawer>
         <Drawer.Screen name="index" options={{drawerLabel: 'Timetable', title: 'Weekly Timetable'}}/>
         <Drawer.Screen name="editor" options={{drawerLabel: 'Edit', title: 'Edit Timetable'}}/>
+        <Drawer.Screen name="editor2" options={{drawerLabel: 'Edit2', title: 'Edit Timetable (fr)'}}/>
         <Drawer.Screen name='about' options={{drawerLabel: 'About', title: 'About Page'}} />
       </Drawer>
     </GestureHandlerRootView>

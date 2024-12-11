@@ -6,3 +6,5 @@ export interface EventData {
     location: string,
     extra_descriptions?: string[]
 }
+
+export const DAYS = ['MON', 'TUE', 'WED', 'THU', 'FRI']
