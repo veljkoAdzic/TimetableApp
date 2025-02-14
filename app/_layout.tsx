@@ -11,12 +11,17 @@
 
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import { Drawer } from 'expo-router/drawer'
+import { DEVELOPER_MODE } from '@/constants/Settings'
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 // SplashScreen.preventAutoHideAsync();
 
 
 export default function RootLayout() {
+  // useEffect(() =>{
+
+  // }, [])
+
   return (
     // <Stack>
     //   <Stack.Screen name="index" options={{ title: 'Home' }} />
@@ -28,6 +33,13 @@ export default function RootLayout() {
         <Drawer.Screen name="editor" options={{drawerLabel: 'Edit', title: 'Edit Timetable'}}/>
         <Drawer.Screen name="editor2" options={{drawerLabel: 'Edit2', title: 'Edit Timetable (fr)'}}/>
         <Drawer.Screen name='about' options={{drawerLabel: 'About', title: 'About Page'}} />
+        
+        <Drawer.Screen name='devTools' options={{
+          drawerLabel: 'Dev Tools', 
+          title: 'Developer Page',
+          drawerItemStyle: (DEVELOPER_MODE) ? {} : {display: 'none'}
+          }} />
+
       </Drawer>
     </GestureHandlerRootView>
 

@@ -55,17 +55,17 @@ export default function Editor(props: EditorProps) {
         },
     ])
 
-    useEffect(() =>{
-        if(props.data != undefined)
-            setData(props.data)
-        else{
-            loadData('timetableData')
-            .then(res =>{
-                let tmp = (res)? JSON.parse(res) : []
-                setData(tmp)
-            })
-        }
-    }, [])
+    // useEffect(() =>{
+    //     if(props.data != undefined)
+    //         setData(props.data)
+    //     else{
+    //         loadData('timetableData')
+    //         .then(res =>{
+    //             let tmp = (res)? JSON.parse(res) : []
+    //             setData(tmp)
+    //         })
+    //     }
+    // }, [])
 
     const renderSections = ({item, index}: {item:string, index: number}) => {
         return (

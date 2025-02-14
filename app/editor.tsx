@@ -28,7 +28,7 @@ export default function EditorScreen() {
             }</Text>
             
             <Pressable 
-            onPressOut={ () =>{
+            onPress={ () =>{
                 setLoader(loaderStates.active)
                 isVersionUpToDate(inputValue)
                 .then(utd => {
