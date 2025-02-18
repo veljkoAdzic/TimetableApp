@@ -1,8 +1,10 @@
 import { View, Text, StyleSheet } from 'react-native'
 import  Grid  from '@/components/Grid'
-import { useEffect } from 'react'
-//import AsyncStorage from '@react-native-async-storage/async-storage'
-const events_data = [
+import { useEffect, useState } from 'react'
+import { loadData, storeData } from '@/utils/localStorage'
+import { EventData } from '@/constants/EventTypes'
+import { DEVELOPER_MODE } from '@/constants/Settings'
+ /*= [
     {
         title: "Matematika 3",
         day: 'MON',
@@ -131,7 +133,7 @@ const events_data = [
         location: "AMF PED",
         extra_descriptions: ["asis d"]
     },
-]
+]*/
 
 function SideBar(){
     return(
@@ -146,7 +148,45 @@ function SideBar(){
     )
 }
 
+
+let events_data: EventData[];
+
 export default function TimetableScreen(props: any){
+    const [loadingEvents, setLoadingEvents] = useState(true)
+
+    useEffect(() =>{
+        if(events_data){
+            const tmp = async () => {
+                await storeData('eventData', JSON.stringify(events_data))
+                if(DEVELOPER_MODE)
+                    console.log("[TimetableScreen>useEffect([])]: stored event data!")
+            }
+
+            if(events_data.length > 0)
+                tmp();
+            
+            setLoadingEvents(false)
+            return;
+        }
+        
+        loadData('eventData')
+        .then((res) => {
+            if(DEVELOPER_MODE)
+                console.log("[TimetableScreen>useEffect([])]: loaded event data!")
+            events_data = (res) ? JSON.parse(res) : [];  
+
+            setLoadingEvents(false);
+        })
+    }, [])
+
+    if(loadingEvents){
+        return(
+            <View>
+                <Text>Loading...</Text>
+            </View>
+        )
+    }
+
     return (
         <View style={styles.ttContainer}>
             <SideBar />
