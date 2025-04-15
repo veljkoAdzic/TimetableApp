@@ -1,6 +1,6 @@
 import { View, Text, TextInput, Pressable, StyleSheet } from 'react-native'
 import { useState } from 'react'
-import { isVersionUpToDate  } from '../utils/timetableData'
+import { isVersionUpToDate  } from '../../utils/timetableData'
 import { loadData } from '@/utils/localStorage'
 
 export default function EditorScreen() {
