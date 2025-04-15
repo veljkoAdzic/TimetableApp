@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react'
 import { DAYS, EventData } from '@/constants/EventTypes'
 import { loadData } from '@/utils/localStorage'
 import { formatEventTitle, loadThemeMap } from '@/utils/eventTools'
-import { EventColorsType } from '@/constants/EventColors'
+import { EventColorsType, EventColors } from '@/constants/EventColors'
 import EditorButtons from '@/components/EditorButtons'
 import { DEVELOPER_MODE } from '@/constants/Settings'
 import DropDownPicker from 'react-native-dropdown-picker'
@@ -23,6 +23,7 @@ function Title(props: {text: string}) {
 
 function Form(props: {data: EventData, editCallback: (edit: EventData) => void}){
     const [formData, setFormData] = useState(props.data)
+
     const [dropdownOpen, setDropdownOpen] = useState(false);
     const [ddItems, setDdItems] = useState([
         {label: 'Monday', value: 'MON'},
@@ -32,14 +33,14 @@ function Form(props: {data: EventData, editCallback: (edit: EventData) => void})
         {label: 'Friday', value: 'FRI'},
         {label: 'Other', value: '-'}
     ])
-
     const [day, setDay] = useState(formData.day);
 
     useEffect(() => {
-        console.log("Change day " + formData.day + " to " + day)
+        if (day == formData.day) return;
+
         let tmp = {...formData, day};
         setFormData(tmp);
-        //props.editCallback(tmp);
+        props.editCallback(formData)
     },[day])
 
 
@@ -56,7 +57,7 @@ function Form(props: {data: EventData, editCallback: (edit: EventData) => void})
                 let tmp = {...formData}
                 tmp.title = tmp.title.trim()
                 setFormData(tmp)
-                //props.editCallback(tmp)
+                props.editCallback(formData)
             } }
             value={formData.title}
             placeholder='Class name'
@@ -64,9 +65,25 @@ function Form(props: {data: EventData, editCallback: (edit: EventData) => void})
 
             <TextInput
             style={styles.input}
-            onChangeText={(text) => { 
+            onChangeText={(shortTitle) => { 
+                let tmp = {...formData, shortTitle};
+                setFormData(tmp)
+            }
+            }
+            onEndEditing={ ()=>{
                 let tmp = {...formData}
-                tmp.location = text
+                tmp.shortTitle = tmp.shortTitle!.trim()
+                setFormData(tmp)
+                props.editCallback(formData)
+            } }
+            value={formData.shortTitle}
+            placeholder='Display name'
+            />
+
+            <TextInput
+            style={styles.input}
+            onChangeText={(location) => { 
+                let tmp = {...formData, location}
                 setFormData(tmp)
             }
             }
@@ -74,11 +91,30 @@ function Form(props: {data: EventData, editCallback: (edit: EventData) => void})
                 let tmp = {...formData}
                 tmp.location = tmp.location.trim()
                 setFormData(tmp)
-                //props.editCallback(tmp) 
+                props.editCallback(formData)
             } }
             value={formData.location}
             placeholder='Location'
             />
+
+            <View style={{padding: 12, flexDirection:'row', alignItems: 'center'}}>
+                <Text>Start time:</Text>
+                <TextInput
+                style={styles.input}
+                onChange={() => {}}
+                onEndEditing={() => {}}
+                value={`${formData.startTime[0]}`.padStart(2, "0")}
+                placeholder='00'
+                />
+                <Text style={{fontSize: 20, fontWeight: 'bold'}}>:</Text>
+                <TextInput
+                style={styles.input}
+                onChange={() => {}}
+                onEndEditing={() => {}}
+                value={`${formData.startTime[1]}`.padStart(2, "0")}
+                placeholder='00'
+                /><TextInput />
+            </View>
 
             <DropDownPicker 
             open={dropdownOpen} 
@@ -95,14 +131,21 @@ function Form(props: {data: EventData, editCallback: (edit: EventData) => void})
 }
 
 
-function Item(props: {data: EventData, index: number, editCallback: (data: EventData, index: number) => void}) {
+function Item(props: {data: EventData, editCallback: (data: EventData, id: number) => void}) {
     const [data, setData] = useState(props.data)
     const [modalVisible, setModalVisible] = useState(false);
-    const theme = {...ThemeMap.get(data.location)}
+    const [theme, setTheme] = useState<EventColorsType>({...ThemeMap.get(data.location)!})
 
     function setEdits(edited: EventData){ // callback for form editing
         setData(edited)
-        //props.editCallback(data, props.index);
+
+        if (!ThemeMap.has(edited.location)){
+            const index = ThemeMap.size % EventColors.length
+            ThemeMap.set(data.location, EventColors[index])
+        }
+        setTheme({...ThemeMap.get(data.location)!})
+
+        props.editCallback(data, data.id);
     }
 
     return(
@@ -111,7 +154,7 @@ function Item(props: {data: EventData, index: number, editCallback: (data: Event
         // style={{backgroundColor: '#FFE9E9', padding: 15, borderRadius: 10, marginRight: 20}}
         onPress={() => setModalVisible(true)}>
             <View style={[styles.item, {backgroundColor: theme.background, borderColor: theme.border}]}>
-                <Text style={{color:theme.text}}>{formatEventTitle(data.title)}</Text>
+                <Text style={{color:theme.text}}>{data.shortTitle}</Text>
                 <Text style={{color: theme.text, opacity: 0.6, fontSize: 10}}>{data.location}</Text>
             </View>
         </Pressable>
@@ -122,7 +165,6 @@ function Item(props: {data: EventData, index: number, editCallback: (data: Event
         transparent={true}
         visible={modalVisible}
         onRequestClose={() => {
-            // Alert.alert('Modal has been closed.');
             setModalVisible(!modalVisible);
         }}
         >
@@ -131,7 +173,8 @@ function Item(props: {data: EventData, index: number, editCallback: (data: Event
             style={{position: 'absolute', top: 0, left: 0, right:0, bottom: 0}}
             onPress={() => {
                 setModalVisible(false)
-                props.editCallback(data,props.index)
+                setEdits(data)
+                //props.editCallback(data,props.index)
             }}
             />
 
@@ -139,27 +182,6 @@ function Item(props: {data: EventData, index: number, editCallback: (data: Event
 
             <Form data={data} editCallback={setEdits} />
 
-            
-            {/* <Text style={{textAlign: 'center', marginBottom: 20, fontSize: 22}}>
-                Delete Async Storage?
-                </Text>
-            <View style={{flexDirection: 'row'}}>
-                <Pressable
-                    style={{backgroundColor: '#FFE9E9', padding: 15, borderRadius: 10, marginRight: 20}}
-                    onPress={() => setModalVisible(false)}>
-                    <Text style={{color: 'red', fontSize: 20}}>Cancel</Text>
-                </Pressable>
-
-                <Pressable
-                    style={{backgroundColor: 'red', padding: 15, borderRadius: 10}}
-                    onPress={() => {
-                        console.log("MODAL " + props.data.title)
-                        setModalVisible(false)
-                    }
-                }>
-                    <Text style={{color: '#FFF', fontSize: 20}}>Delete</Text>
-                </Pressable>
-            </View> */}
             </View>
         </View>
         </Modal>
@@ -195,9 +217,20 @@ export default function Editor(props: EditorProps) {
             loadData('eventData')
             .then(res =>{
                 let tmp = (res)? JSON.parse(res) : []
+
                 setData(tmp)
             })
         }
+
+        //populate shortTitle
+        let tmp =[]
+        for( let d of data ){
+            if(!d.shortTitle)
+                d.shortTitle = formatEventTitle(d.title)
+            tmp.push(d)
+        }
+        setData(tmp)
+
         setLoading(false);
     }, [])
 
@@ -209,10 +242,10 @@ export default function Editor(props: EditorProps) {
         )
     }
 
-    function editData(changes: EventData, i: number){
+    function editData(changes: EventData, id: number){
         let tmp = [...data]
-        tmp = tmp.map((item, ind) => ind == i ? changes : item)
-        tmp.push(changes)
+        tmp = tmp.map((item) => item.id == id ? changes : item)
+        // tmp.push(changes)
         setData(tmp);
     }
 
@@ -251,7 +284,7 @@ export default function Editor(props: EditorProps) {
                                                 (index == sections.length-1 && !DAYS.includes(event.day))
                                     )
                         .map((tile, j) => {
-                            return <Item key={j} data={tile} index={j} editCallback={editData}/>
+                            return <Item key={tile.id} data={tile} editCallback={editData}/>
                         })
                     }
                 </View>

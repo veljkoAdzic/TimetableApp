@@ -4,7 +4,11 @@ export interface EventData {
     startTime: number[],
     endTime: number[],
     location: string,
-    extra_descriptions?: string[]
+    extra_descriptions?: string[],
+
+    shortTitle?: string,
+    id: number
 }
 
 export const DAYS = ['MON', 'TUE', 'WED', 'THU', 'FRI']
+

@@ -70,7 +70,9 @@ export default function EventBlock(props: EventBlockProps){
         //     setTheme( getTheme(props.data.location) )
         // })
         // storeData('ThemeMap', JSON.stringify([...ThemeMap]))
-
+        if(!props.data.shortTitle){
+            props.data.shortTitle = formatEventTitle(props.data.title)
+        }
         
       }, []);
 
@@ -81,7 +83,7 @@ export default function EventBlock(props: EventBlockProps){
             findDimensions(props.data), 
             {backgroundColor: theme.background, borderColor: theme.border}
             ]) }>
-                <Text style={{color: theme.text}}>{formatEventTitle(props.data.title)}</Text>
+                <Text style={{color: theme.text}}>{props.data.shortTitle}</Text>
                 <Text style={{fontSize: 10, color: theme.text, opacity: 0.5}}>{props.data.location}</Text>
             </View>
         </>

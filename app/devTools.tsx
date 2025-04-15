@@ -1,4 +1,5 @@
-import { clearStorage, listStoredData } from "@/utils/localStorage"
+import { DEVELOPER_MODE } from "@/constants/Settings"
+import { clearStorage, listStoredData, storeData } from "@/utils/localStorage"
 import { useState } from "react"
 import { View, Text, StyleSheet, Pressable, FlatList, ScrollView, Modal } from "react-native" 
 import { ColorProperties } from "react-native-reanimated/lib/typescript/Colors"
@@ -74,6 +75,158 @@ function Table(props:{header: string[], data: Map<string, string>}){
             }
         </View>
     )
+}
+
+function generateDummyData(){
+    if (!DEVELOPER_MODE) return;
+
+    const data = [
+    {
+        id: 1,
+        title: "Matematika 3",
+        day: 'MON',
+        startTime: [8, 0],
+        endTime: [10, 45],
+        location: "AMF PED",
+        extra_descriptions: ["Prof a"]
+    },
+
+    {
+        id: 2,
+        title: "Kompjuterski Mrezi i Bezbednost",
+        day: 'MON',
+        startTime: [11, 0],
+        endTime: [12, 45],
+        location: "AMF PED",
+        extra_descriptions: ["Prof b"]
+    },
+    {
+        id: 3,
+        title: "Digitizacija A",
+        day: 'MON',
+        startTime: [14, 0],
+        endTime: [15, 30],
+        location: "2",
+        extra_descriptions: ["labs"]
+    },
+
+    {
+        id: 4,
+        title: "Algoritmi i Podatocni Strukturi",
+        day: 'MON',
+        startTime: [15, 30],
+        endTime: [17, 0],
+        location: "215",
+        extra_descriptions: ["labs"]
+    },
+
+    {
+        id: 5,
+        title: "Matematika 3 A",
+        day: 'MON',
+        startTime: [18, 30],
+        endTime: [20, 0],
+        location: "2",
+        extra_descriptions: ["labs"]
+    },
+
+    {
+        id: 6,
+        title: "Kompjuterski Mrezi i Bezbednost",
+        day: 'TUE',
+        startTime: [15, 30],
+        endTime: [17, 0],
+        location: "215",
+        extra_descriptions: ["labs"]
+    },
+
+    {
+        id: 7,
+        title: "Matematika 3",
+        day: 'TUE',
+        startTime: [17, 0],
+        endTime: [19, 45],
+        location: "AMF PED",
+        extra_descriptions: ["Asis a"]
+    },
+
+    {
+        id: 8,
+        title: "Internet Programiranje na Klientska Strana",
+        day: 'THU',
+        startTime: [10, 0],
+        endTime: [11, 45],
+        location: "223",
+        extra_descriptions: ["Prof c"]
+    },
+
+    {
+        id: 9,
+        title: "Internet Programiranje na Klientska Strana",
+        day: 'THU',
+        startTime: [12, 0],
+        endTime: [12, 45],
+        location: "223",
+        extra_descriptions: ["Asis b"]
+    },
+
+    {
+        id: 10,
+        title: "Digitizacija",
+        day: 'FRI',
+        startTime: [12, 0],
+        endTime: [13, 45],
+        location: "FINKI AMF G",
+        extra_descriptions: ["Asis b"]
+    },
+    {
+        id: 11,
+        title: "Digitizacija",
+        day: 'FRI',
+        startTime: [14, 0],
+        endTime: [15, 45],
+        location: "FINKI AMF G",
+        extra_descriptions: ["Prof c"]
+    },
+    {
+        id: 12,
+        title: "Internet Programiranje na Klientska Strana",
+        day: 'THU',
+        startTime: [12, 30],
+        endTime: [14, 0],
+        location: "138",
+        extra_descriptions: ["labs"]
+    },
+    {
+        id: 13,
+        title: "Kompjuterski Mrezi i Bezbednost",
+        day: 'THU',
+        startTime: [14, 0],
+        endTime: [15, 45],
+        location: "AMF PED",
+        extra_descriptions: ["asis d"]
+    },
+    {
+        id: 14,
+        title: "Algoritmi i Podatocni Strukturi",
+        day: 'THU',
+        startTime: [16, 0],
+        endTime: [17, 45],
+        location: "AMF PED",
+        extra_descriptions: ["prof d"]
+    },
+    {
+        id: 15,
+        title: "Algoritmi i Podatocni Strukturi",
+        day: 'THU',
+        startTime: [18, 0],
+        endTime: [19, 45],
+        location: "AMF PED",
+        extra_descriptions: ["asis d"]
+    },
+    ]
+
+    storeData('eventData', JSON.stringify(data))
 }
 
 export default function DevScreen(){
@@ -153,6 +306,21 @@ export default function DevScreen(){
                 </Modal>
 
             </View>
+
+            <View>
+            <Pressable 
+                onPress={ () =>{
+                    generateDummyData()
+                } }
+                >
+                    { ({pressed}) =>
+                    <Text style={[styles.button, (pressed) ? styles.buttonActive : styles.buttonPassive]}>Generate Dummy Data</Text>
+                    }
+                </Pressable>
+            </View>
+
+
+            
         </ScrollView>
         </View>
     )

@@ -1,4 +1,5 @@
 import { DEVELOPER_MODE } from "@/constants/Settings"
+import { EventData } from "@/constants/EventTypes"
 import { loadData } from "./localStorage"
 
 export function formatEventTitle(title: string) {
@@ -39,3 +40,14 @@ export const loadThemeMap = async (map: Map<any, any>) => {
             map.set(entry[0], entry[1])
         });        
     }
+
+export function generateID(existing: EventData[]){
+    const MOD = existing.length * 2
+    
+    let i = 0
+    while (i < MOD) {
+        let res = Math.floor(Math.random() * MOD) 
+        if ( existing.filter((event) => {return event.id == res}).length == 0 )
+            return res
+    }
+}

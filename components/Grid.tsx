@@ -2,7 +2,7 @@ import { View, SafeAreaView, Text, StyleSheet } from 'react-native'
 import EventBlock from './EventBlock'
 import { EventData } from '../constants/EventTypes'
 import { EventColorsType, EventColors } from '@/constants/EventColors'
-import { loadThemeMap } from '@/utils/eventTools'
+import { formatEventTitle, loadThemeMap } from '@/utils/eventTools'
 import { useEffect, useState } from 'react'
 import { storeData } from '@/utils/localStorage'
 import { DEVELOPER_MODE } from '@/constants/Settings'
@@ -61,7 +61,21 @@ export default function Grid(props: GridProps){
                     console.log("[Grid>useEffect]: Stored " +
                         JSON.stringify([...ThemeMap]))  // debugging
             });
-        });
+        })
+        .then(() => {
+            modified = false // reused flag
+            for (let e of props.events) {
+                if(!e.shortTitle){
+                    e.shortTitle = formatEventTitle(e.title)
+                    modified = true
+                }
+            }
+
+            if (modified){
+                // store the changes
+                storeData('eventData', JSON.stringify(props.events))
+            }
+        })
     },[])
     
     if(!themeLoaded){
@@ -92,7 +106,7 @@ export default function Grid(props: GridProps){
             {
             // Loading events
             props.events.map( (item, index) => (
-                <EventBlock key={index} data={item} theme={ThemeMap.get(item.location)} />
+                <EventBlock key={item.id} data={item} theme={ThemeMap.get(item.location)} />
             ) )
             }
         </View>
