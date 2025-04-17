@@ -8,6 +8,7 @@ import EditorButtons from '@/components/EditorButtons'
 import { DEVELOPER_MODE } from '@/constants/Settings'
 import DropDownPicker from 'react-native-dropdown-picker'
 import DateTimePicker from '@react-native-community/datetimepicker'
+import Time from '@/constants/TimeClass'
 
 interface EditorProps {
     data?: EventData[]
@@ -36,6 +37,8 @@ function Form(props: {data: EventData, editCallback: (edit: EventData) => void})
     ])
     const [day, setDay] = useState(formData.day);
 
+    // useEffect(()=>{props.editCallback(formData); console.log(formData)},[formData])
+
     useEffect(() => {
         if (day == formData.day) return;
 
@@ -44,14 +47,11 @@ function Form(props: {data: EventData, editCallback: (edit: EventData) => void})
         props.editCallback(formData)
     },[day])
 
-    const [date, setDate] = useState(new Date())
+    const [StartTime, setStartTime] = useState(new Time(formData.startTime))
     const [startTimeVisible, setStartTimeVisible] = useState(false)
 
     useEffect(()=>{
-        let d = new Date()
-        d.setHours(formData.startTime[0])
-        d.setMinutes(formData.startTime[1])
-        setDate(d)
+        setStartTime(new Time(formData.startTime))
     },[])
 
     const showStartTimePicker = () => {
@@ -111,21 +111,34 @@ function Form(props: {data: EventData, editCallback: (edit: EventData) => void})
             placeholder='Location'
             />
 
-            <View style={{padding: 12, flexDirection:'row', alignItems: 'center'}}>
-                <Button title="Start Time" onPress={() => {setStartTimeVisible(true)}}/>
-                <Text>{`${formData.startTime[0]}`.padStart(2, '0') + ":" + `${formData.startTime[1]}`.padStart(2, '0') }</Text>
+            <View style={{padding: 12, flexDirection:'row', alignItems: 'center', gap: 5}}>
+                
+                <Pressable onPress={() => {setStartTimeVisible(true)}}>
+                <Text style={{fontSize:14, color: 'white', backgroundColor: 'black', padding: 12 }}>Change Start Time</Text>
+                </Pressable>
+                
+                
+                <Text style={[{fontSize: 20, paddingHorizontal: 5}]}>{ StartTime.toString() }</Text>
+                
                 {startTimeVisible &&
                 <DateTimePicker
-                value={date} 
+                value={StartTime.toDate()} 
                 mode={'time'}
                 is24Hour={true}
                 onChange={(ev, selected) => {
-                    const curr = selected
+                    if (selected == undefined) return;
+
+                    const curr = new Time(selected)
                     setStartTimeVisible(false);
-                    setDate(curr!);
-                    const startTime = [curr!.getHours(), curr!.getMinutes()]
-                    setFormData({...formData, startTime})
-                    props.editCallback(formData)
+
+                    setStartTime(curr)
+                    
+                    const startTime = [curr.hours, curr.minutes]
+                    let tmp = {...formData, startTime}
+
+                    setFormData(tmp);
+
+                    props.editCallback(tmp) // IDK WHYYYY but when using formData it isn't updating
                 }}
                 />}
             </View>
@@ -136,7 +149,6 @@ function Form(props: {data: EventData, editCallback: (edit: EventData) => void})
             items={ddItems}
             setOpen={setDropdownOpen}
             setValue={setDay}
-            // onChangeValue={() => props.editCallback(formData)}
             setItems={setDdItems}
             />
             

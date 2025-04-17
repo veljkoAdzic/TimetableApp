@@ -1,3 +1,4 @@
+// TODO: change start and end time to Time class!
 export interface EventData {
     title: string,
     day: string,
