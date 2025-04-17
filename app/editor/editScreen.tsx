@@ -1,4 +1,4 @@
-import { View, FlatList, Text, StyleSheet, Modal, Pressable, TextInput } from 'react-native'
+import { View, FlatList, Text, StyleSheet, Modal, Pressable, TextInput, Button } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { DAYS, EventData } from '@/constants/EventTypes'
 import { loadData } from '@/utils/localStorage'
@@ -7,6 +7,7 @@ import { EventColorsType, EventColors } from '@/constants/EventColors'
 import EditorButtons from '@/components/EditorButtons'
 import { DEVELOPER_MODE } from '@/constants/Settings'
 import DropDownPicker from 'react-native-dropdown-picker'
+import DateTimePicker from '@react-native-community/datetimepicker'
 
 interface EditorProps {
     data?: EventData[]
@@ -43,6 +44,19 @@ function Form(props: {data: EventData, editCallback: (edit: EventData) => void})
         props.editCallback(formData)
     },[day])
 
+    const [date, setDate] = useState(new Date())
+    const [startTimeVisible, setStartTimeVisible] = useState(false)
+
+    useEffect(()=>{
+        let d = new Date()
+        d.setHours(formData.startTime[0])
+        d.setMinutes(formData.startTime[1])
+        setDate(d)
+    },[])
+
+    const showStartTimePicker = () => {
+        setStartTimeVisible(true);
+    }
 
     return (
         <View>
@@ -98,22 +112,22 @@ function Form(props: {data: EventData, editCallback: (edit: EventData) => void})
             />
 
             <View style={{padding: 12, flexDirection:'row', alignItems: 'center'}}>
-                <Text>Start time:</Text>
-                <TextInput
-                style={styles.input}
-                onChange={() => {}}
-                onEndEditing={() => {}}
-                value={`${formData.startTime[0]}`.padStart(2, "0")}
-                placeholder='00'
-                />
-                <Text style={{fontSize: 20, fontWeight: 'bold'}}>:</Text>
-                <TextInput
-                style={styles.input}
-                onChange={() => {}}
-                onEndEditing={() => {}}
-                value={`${formData.startTime[1]}`.padStart(2, "0")}
-                placeholder='00'
-                /><TextInput />
+                <Button title="Start Time" onPress={() => {setStartTimeVisible(true)}}/>
+                <Text>{`${formData.startTime[0]}`.padStart(2, '0') + ":" + `${formData.startTime[1]}`.padStart(2, '0') }</Text>
+                {startTimeVisible &&
+                <DateTimePicker
+                value={date} 
+                mode={'time'}
+                is24Hour={true}
+                onChange={(ev, selected) => {
+                    const curr = selected
+                    setStartTimeVisible(false);
+                    setDate(curr!);
+                    const startTime = [curr!.getHours(), curr!.getMinutes()]
+                    setFormData({...formData, startTime})
+                    props.editCallback(formData)
+                }}
+                />}
             </View>
 
             <DropDownPicker 
