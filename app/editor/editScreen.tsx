@@ -1,14 +1,12 @@
-import { View, FlatList, Text, StyleSheet, Modal, Pressable, TextInput, Button } from 'react-native'
+import { View, FlatList, Text, StyleSheet, Pressable} from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { DAYS, EventData } from '@/constants/EventTypes'
 import { loadData } from '@/utils/localStorage'
 import { formatEventTitle, loadThemeMap } from '@/utils/eventTools'
 import { EventColorsType, EventColors } from '@/constants/EventColors'
-import EditorButtons from '@/components/EditorButtons'
+import EditorButtons from '@/components/editor/Buttons'
 import { DEVELOPER_MODE } from '@/constants/Settings'
-import DropDownPicker from 'react-native-dropdown-picker'
-import DateTimePicker from '@react-native-community/datetimepicker'
-import Time from '@/constants/TimeClass'
+import Item from '@/components/editor/Item'
 
 interface EditorProps {
     data?: EventData[]
@@ -20,198 +18,6 @@ function Title(props: {text: string}) {
             <Text style={styles.titleText}>{props.text}</Text>
             <View style={styles.titleLine} />
         </View>
-    )
-}
-
-function Form(props: {data: EventData, editCallback: (edit: EventData) => void}){
-    const [formData, setFormData] = useState(props.data)
-
-    const [dropdownOpen, setDropdownOpen] = useState(false);
-    const [ddItems, setDdItems] = useState([
-        {label: 'Monday', value: 'MON'},
-        {label: 'Tuesday', value: 'TUE'},
-        {label: 'Wednesday', value: 'WED'},
-        {label: 'Thursday', value: 'THU'},
-        {label: 'Friday', value: 'FRI'},
-        {label: 'Other', value: '-'}
-    ])
-    const [day, setDay] = useState(formData.day);
-
-    // useEffect(()=>{props.editCallback(formData); console.log(formData)},[formData])
-
-    useEffect(() => {
-        if (day == formData.day) return;
-
-        let tmp = {...formData, day};
-        setFormData(tmp);
-        props.editCallback(formData)
-    },[day])
-
-    const [StartTime, setStartTime] = useState(new Time(formData.startTime))
-    const [startTimeVisible, setStartTimeVisible] = useState(false)
-
-    useEffect(()=>{
-        setStartTime(new Time(formData.startTime))
-    },[])
-
-    const showStartTimePicker = () => {
-        setStartTimeVisible(true);
-    }
-
-    return (
-        <View>
-            <TextInput
-            style={styles.input}
-            onChangeText={(title) => { 
-                let tmp = {...formData, title};
-                setFormData(tmp)
-            }
-            }
-            onEndEditing={ ()=>{
-                let tmp = {...formData}
-                tmp.title = tmp.title.trim()
-                setFormData(tmp)
-                props.editCallback(formData)
-            } }
-            value={formData.title}
-            placeholder='Class name'
-            />
-
-            <TextInput
-            style={styles.input}
-            onChangeText={(shortTitle) => { 
-                let tmp = {...formData, shortTitle};
-                setFormData(tmp)
-            }
-            }
-            onEndEditing={ ()=>{
-                let tmp = {...formData}
-                tmp.shortTitle = tmp.shortTitle!.trim()
-                setFormData(tmp)
-                props.editCallback(formData)
-            } }
-            value={formData.shortTitle}
-            placeholder='Display name'
-            />
-
-            <TextInput
-            style={styles.input}
-            onChangeText={(location) => { 
-                let tmp = {...formData, location}
-                setFormData(tmp)
-            }
-            }
-            onEndEditing={ ()=>{
-                let tmp = {...formData}
-                tmp.location = tmp.location.trim()
-                setFormData(tmp)
-                props.editCallback(formData)
-            } }
-            value={formData.location}
-            placeholder='Location'
-            />
-
-            <View style={{padding: 12, flexDirection:'row', alignItems: 'center', gap: 5}}>
-                
-                <Pressable onPress={() => {setStartTimeVisible(true)}}>
-                <Text style={{fontSize:14, color: 'white', backgroundColor: 'black', padding: 12 }}>Change Start Time</Text>
-                </Pressable>
-                
-                
-                <Text style={[{fontSize: 20, paddingHorizontal: 5}]}>{ StartTime.toString() }</Text>
-                
-                {startTimeVisible &&
-                <DateTimePicker
-                value={StartTime.toDate()} 
-                mode={'time'}
-                is24Hour={true}
-                onChange={(ev, selected) => {
-                    if (selected == undefined) return;
-
-                    const curr = new Time(selected)
-                    setStartTimeVisible(false);
-
-                    setStartTime(curr)
-                    
-                    const startTime = [curr.hours, curr.minutes]
-                    let tmp = {...formData, startTime}
-
-                    setFormData(tmp);
-
-                    props.editCallback(tmp) // IDK WHYYYY but when using formData it isn't updating
-                }}
-                />}
-            </View>
-
-            <DropDownPicker 
-            open={dropdownOpen} 
-            value={formData.day}
-            items={ddItems}
-            setOpen={setDropdownOpen}
-            setValue={setDay}
-            setItems={setDdItems}
-            />
-            
-        </View>
-    )
-}
-
-
-function Item(props: {data: EventData, editCallback: (data: EventData, id: number) => void}) {
-    const [data, setData] = useState(props.data)
-    const [modalVisible, setModalVisible] = useState(false);
-    const [theme, setTheme] = useState<EventColorsType>({...ThemeMap.get(data.location)!})
-
-    function setEdits(edited: EventData){ // callback for form editing
-        setData(edited)
-
-        if (!ThemeMap.has(edited.location)){
-            const index = ThemeMap.size % EventColors.length
-            ThemeMap.set(data.location, EventColors[index])
-        }
-        setTheme({...ThemeMap.get(data.location)!})
-
-        props.editCallback(data, data.id);
-    }
-
-    return(
-        <>
-        <Pressable
-        // style={{backgroundColor: '#FFE9E9', padding: 15, borderRadius: 10, marginRight: 20}}
-        onPress={() => setModalVisible(true)}>
-            <View style={[styles.item, {backgroundColor: theme.background, borderColor: theme.border}]}>
-                <Text style={{color:theme.text}}>{data.shortTitle}</Text>
-                <Text style={{color: theme.text, opacity: 0.6, fontSize: 10}}>{data.location}</Text>
-            </View>
-        </Pressable>
-        
-
-        <Modal
-        animationType="fade"
-        transparent={true}
-        visible={modalVisible}
-        onRequestClose={() => {
-            setModalVisible(!modalVisible);
-        }}
-        >
-        <View style={styles.centeredView}>
-            <Pressable
-            style={{position: 'absolute', top: 0, left: 0, right:0, bottom: 0}}
-            onPress={() => {
-                setModalVisible(false)
-                setEdits(data)
-                //props.editCallback(data,props.index)
-            }}
-            />
-
-            <View style={[styles.modalView, {backgroundColor: theme.background, borderColor: theme.border}]}>
-
-            <Form data={data} editCallback={setEdits} />
-
-            </View>
-        </View>
-        </Modal>
-        </>
     )
 }
 
@@ -310,7 +116,7 @@ export default function Editor(props: EditorProps) {
                                                 (index == sections.length-1 && !DAYS.includes(event.day))
                                     )
                         .map((tile, j) => {
-                            return <Item key={tile.id} data={tile} editCallback={editData}/>
+                            return <Item key={tile.id} data={tile} ThemeMap={ThemeMap} editCallback={editData}/>
                         })
                     }
                 </View>
@@ -367,35 +173,35 @@ const styles = StyleSheet.create({
         
         paddingHorizontal: 15
     },
-    item: {
-        backgroundColor: 'orange',
-        height: 110,
-        aspectRatio: 6/8,
-        borderRadius: 5
-    },
+    // item: {
+    //     backgroundColor: 'orange',
+    //     height: 110,
+    //     aspectRatio: 6/8,
+    //     borderRadius: 5
+    // },
 
-    centeredView: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: '#0008'
-    },
-    modalView: {
-        margin: 20,
-        backgroundColor: 'white',
-        borderRadius: 20,
-        padding: 35,
-        alignItems: 'center',
-        elevation: 5,
-        width: "80%"
-    },
+    // centeredView: {
+    //     flex: 1,
+    //     justifyContent: 'center',
+    //     alignItems: 'center',
+    //     backgroundColor: '#0008'
+    // },
+    // modalView: {
+    //     margin: 20,
+    //     backgroundColor: 'white',
+    //     borderRadius: 20,
+    //     padding: 35,
+    //     alignItems: 'center',
+    //     elevation: 5,
+    //     width: "80%"
+    // },
 
-    input: {
-        height: 40,
-        margin: 12,
-        borderWidth: 1,
-        padding: 10,
-    },
+    // input: {
+    //     height: 40,
+    //     margin: 12,
+    //     borderWidth: 1,
+    //     padding: 10,
+    // },
 
     button: { 
         paddingHorizontal: 18, 
