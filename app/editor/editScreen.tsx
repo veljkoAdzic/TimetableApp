@@ -173,36 +173,6 @@ const styles = StyleSheet.create({
         
         paddingHorizontal: 15
     },
-    // item: {
-    //     backgroundColor: 'orange',
-    //     height: 110,
-    //     aspectRatio: 6/8,
-    //     borderRadius: 5
-    // },
-
-    // centeredView: {
-    //     flex: 1,
-    //     justifyContent: 'center',
-    //     alignItems: 'center',
-    //     backgroundColor: '#0008'
-    // },
-    // modalView: {
-    //     margin: 20,
-    //     backgroundColor: 'white',
-    //     borderRadius: 20,
-    //     padding: 35,
-    //     alignItems: 'center',
-    //     elevation: 5,
-    //     width: "80%"
-    // },
-
-    // input: {
-    //     height: 40,
-    //     margin: 12,
-    //     borderWidth: 1,
-    //     padding: 10,
-    // },
-
     button: { 
         paddingHorizontal: 18, 
         paddingVertical: 6, 

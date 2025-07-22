@@ -54,7 +54,7 @@ export default function Item(props: {data: EventData, ThemeMap: Map<string, Even
 
             <View style={[styles.modalView, {backgroundColor: theme.background, borderColor: theme.border}]}>
 
-            <Form data={data} editCallback={setEdits} />
+            <Form data={data} theme={theme} editCallback={setEdits} />
 
             </View>
         </View>

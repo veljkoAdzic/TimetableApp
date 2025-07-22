@@ -4,9 +4,9 @@ import Time from "@/constants/TimeClass";
 import { View, Text, StyleSheet, Pressable, TextInput } from 'react-native'
 import DropDownPicker from 'react-native-dropdown-picker'
 import DateTimePicker from '@react-native-community/datetimepicker'
+import { EventColorsType } from "@/constants/EventColors";
 
-
-export default function Form(props: {data: EventData, editCallback: (edit: EventData) => void}){
+export default function Form(props: {data: EventData, theme: EventColorsType, editCallback: (edit: EventData) => void}){
     const [formData, setFormData] = useState(props.data)
 
     const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -47,7 +47,7 @@ export default function Form(props: {data: EventData, editCallback: (edit: Event
     return (
         <View>
             <TextInput
-            style={styles.input}
+            style={[styles.input, {color: props.theme.text}]}
             onChangeText={(title) => { 
                 let tmp = {...formData, title};
                 setFormData(tmp)
@@ -64,7 +64,7 @@ export default function Form(props: {data: EventData, editCallback: (edit: Event
             />
 
             <TextInput
-            style={styles.input}
+            style={[styles.input, {color: props.theme.text}]}
             onChangeText={(shortTitle) => { 
                 let tmp = {...formData, shortTitle};
                 setFormData(tmp)
@@ -81,7 +81,7 @@ export default function Form(props: {data: EventData, editCallback: (edit: Event
             />
 
             <TextInput
-            style={styles.input}
+            style={[styles.input, {color: props.theme.text}]}
             onChangeText={(location) => { 
                 let tmp = {...formData, location}
                 setFormData(tmp)
@@ -97,11 +97,11 @@ export default function Form(props: {data: EventData, editCallback: (edit: Event
             placeholder='Location'
             />
 
-            <View style={{padding: 12, flexDirection:'row', alignItems: 'center', gap: 5}}>
-                <Text style={[{fontSize: 20, paddingHorizontal: 5}]}>Start Time</Text>
+            <View style={styles.TimeSection}>
+                <Text style={[{fontSize: 20, paddingHorizontal: 5, color: props.theme.text}]}>Start Time</Text>
 
                 <Pressable onPress={() => {setStartTimeVisible(true)}}>
-                <Text style={{fontSize:14, color: 'white', backgroundColor: 'black', padding: 12 }}>{StartTime.toString()}</Text>
+                <Text style={[styles.TimeButton, {color: props.theme.text}]}>{StartTime.toString()}</Text>
                 </Pressable>
                 
                 {startTimeVisible &&
@@ -127,11 +127,11 @@ export default function Form(props: {data: EventData, editCallback: (edit: Event
                 />}
             </View>
 
-            <View style={{padding: 12, flexDirection:'row', alignItems: 'center', gap: 5}}>
-                <Text style={[{fontSize: 20, paddingHorizontal: 5}]}>End Time</Text>
+            <View style={styles.TimeSection}>
+                <Text style={[{fontSize: 20, paddingHorizontal: 5, color: props.theme.text}]}>End Time</Text>
 
                 <Pressable onPress={() => {setEndTimeVisible(true)}}>
-                <Text style={{fontSize:14, color: 'white', backgroundColor: 'black', padding: 12 }}>{EndTime.toString()}</Text>
+                <Text style={[styles.TimeButton, {color: props.theme.text}]}>{EndTime.toString()}</Text>
                 </Pressable>
                 
                 {endTimeVisible &&
@@ -164,6 +164,9 @@ export default function Form(props: {data: EventData, editCallback: (edit: Event
             setOpen={setDropdownOpen}
             setValue={setDay}
             setItems={setDdItems}
+            style={styles.DrowdownStyle}
+            labelStyle={{color: props.theme.text}}
+            dropDownContainerStyle={{margin: 12, borderRadius: 0}}
             />
             
         </View>
@@ -176,5 +179,24 @@ const styles = StyleSheet.create({
         margin: 12,
         borderWidth: 1,
         padding: 10,
+        backgroundColor: '#FFF4', 
     },
+    TimeSection: {
+        padding: 12, 
+        flexDirection:'row', 
+        alignItems: 'center', 
+        justifyContent: 'space-between',
+        gap: 5,
+    },
+    TimeButton: {
+        fontSize:14, 
+        backgroundColor: '#FFF4', 
+        borderWidth: 1,
+        padding: 12 
+    },
+    DrowdownStyle: {
+        margin: 12,
+        backgroundColor: '#FFF4',
+        borderRadius: 0
+    }
 })
