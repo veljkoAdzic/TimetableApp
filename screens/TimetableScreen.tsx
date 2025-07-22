@@ -4,136 +4,6 @@ import { useEffect, useState } from 'react'
 import { loadData, storeData } from '@/utils/localStorage'
 import { EventData } from '@/constants/EventTypes'
 import { DEVELOPER_MODE } from '@/constants/Settings'
- /*= [
-    {
-        title: "Matematika 3",
-        day: 'MON',
-        startTime: [8, 0],
-        endTime: [10, 45],
-        location: "AMF PED",
-        extra_descriptions: ["Prof a"]
-    },
-
-    {
-        title: "Kompjuterski Mrezi i Bezbednost",
-        day: 'MON',
-        startTime: [11, 0],
-        endTime: [12, 45],
-        location: "AMF PED",
-        extra_descriptions: ["Prof b"]
-    },
-    {
-        title: "Digitizacija A",
-        day: 'MON',
-        startTime: [14, 0],
-        endTime: [15, 30],
-        location: "2",
-        extra_descriptions: ["labs"]
-    },
-
-    {
-        title: "Algoritmi i Podatocni Strukturi",
-        day: 'MON',
-        startTime: [15, 30],
-        endTime: [17, 0],
-        location: "215",
-        extra_descriptions: ["labs"]
-    },
-
-    {
-        title: "Matematika 3 A",
-        day: 'MON',
-        startTime: [18, 30],
-        endTime: [20, 0],
-        location: "2",
-        extra_descriptions: ["labs"]
-    },
-
-    {
-        title: "Kompjuterski Mrezi i Bezbednost",
-        day: 'TUE',
-        startTime: [15, 30],
-        endTime: [17, 0],
-        location: "215",
-        extra_descriptions: ["labs"]
-    },
-
-    {
-        title: "Matematika 3",
-        day: 'TUE',
-        startTime: [17, 0],
-        endTime: [19, 45],
-        location: "AMF PED",
-        extra_descriptions: ["Asis a"]
-    },
-
-    {
-        title: "Internet Programiranje na Klientska Strana",
-        day: 'THU',
-        startTime: [10, 0],
-        endTime: [11, 45],
-        location: "223",
-        extra_descriptions: ["Prof c"]
-    },
-
-    {
-        title: "Internet Programiranje na Klientska Strana",
-        day: 'THU',
-        startTime: [12, 0],
-        endTime: [12, 45],
-        location: "223",
-        extra_descriptions: ["Asis b"]
-    },
-
-    {
-        title: "Digitizacija",
-        day: 'FRI',
-        startTime: [12, 0],
-        endTime: [13, 45],
-        location: "FINKI AMF G",
-        extra_descriptions: ["Asis b"]
-    },
-    {
-        title: "Digitizacija",
-        day: 'FRI',
-        startTime: [14, 0],
-        endTime: [15, 45],
-        location: "FINKI AMF G",
-        extra_descriptions: ["Prof c"]
-    },
-    {
-        title: "Internet Programiranje na Klientska Strana",
-        day: 'THU',
-        startTime: [12, 30],
-        endTime: [14, 0],
-        location: "138",
-        extra_descriptions: ["labs"]
-    },
-    {
-        title: "Kompjuterski Mrezi i Bezbednost",
-        day: 'THU',
-        startTime: [14, 0],
-        endTime: [15, 45],
-        location: "AMF PED",
-        extra_descriptions: ["asis d"]
-    },
-    {
-        title: "Algoritmi i Podatocni Strukturi",
-        day: 'THU',
-        startTime: [16, 0],
-        endTime: [17, 45],
-        location: "AMF PED",
-        extra_descriptions: ["prof d"]
-    },
-    {
-        title: "Algoritmi i Podatocni Strukturi",
-        day: 'THU',
-        startTime: [18, 0],
-        endTime: [19, 45],
-        location: "AMF PED",
-        extra_descriptions: ["asis d"]
-    },
-]*/
 
 function SideBar(){
     return(
@@ -149,11 +19,24 @@ function SideBar(){
 }
 
 
-let events_data: EventData[];
 
-export default function TimetableScreen(props: any){
+export default function TimetableScreen(props: {reload?: boolean}){
     const [loadingEvents, setLoadingEvents] = useState(true)
+    const [events_data, setEventData] = useState<EventData[] | null>(null)
 
+    useEffect(()=>{
+        if(props.reload){
+            loadData('eventData')
+            .then((res) => {
+                if(DEVELOPER_MODE)
+                    console.log("[TimetableScreen>useEffect([reload])]: Rerender")
+                let data = (res) ? JSON.parse(res) : [];  
+                setEventData(data)
+                setLoadingEvents(false);
+            })
+        }
+    },[props.reload])
+        
     useEffect(() =>{
         if(events_data){
             const tmp = async () => {
@@ -173,8 +56,8 @@ export default function TimetableScreen(props: any){
         .then((res) => {
             if(DEVELOPER_MODE)
                 console.log("[TimetableScreen>useEffect([])]: loaded event data!")
-            events_data = (res) ? JSON.parse(res) : [];  
-
+            let data = (res) ? JSON.parse(res) : [];  
+            setEventData(data)
             setLoadingEvents(false);
         })
     }, [])
@@ -191,7 +74,7 @@ export default function TimetableScreen(props: any){
         <View style={styles.ttContainer}>
             <SideBar />
             <View style={styles.gridContainer}>
-                <Grid events={events_data} />
+                <Grid events={events_data!} />
             </View>
         </View>
     )

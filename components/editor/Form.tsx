@@ -18,17 +18,7 @@ export default function Form(props: {data: EventData, theme: EventColorsType, ed
         {label: 'Friday', value: 'FRI'},
         {label: 'Other', value: '-'}
     ])
-    const [day, setDay] = useState(formData.day);
-
-    // useEffect(()=>{props.editCallback(formData); console.log(formData)},[formData])
-
-    useEffect(() => {
-        if (day == formData.day) return;
-
-        let tmp = {...formData, day};
-        setFormData(tmp);
-        props.editCallback(formData)
-    },[day])
+    const [dropdownValue, setDropdownValue] = useState(formData.day);
 
     const [StartTime, setStartTime] = useState(new Time(formData.startTime))
     const [startTimeVisible, setStartTimeVisible] = useState(false)
@@ -159,13 +149,20 @@ export default function Form(props: {data: EventData, theme: EventColorsType, ed
 
             <DropDownPicker 
             open={dropdownOpen} 
-            value={formData.day}
+            value={dropdownValue}
             items={ddItems}
             setOpen={setDropdownOpen}
-            setValue={setDay}
+            setValue={setDropdownValue}
+            onChangeValue={(day: string | null) => {
+                if (day == null) return; 
+                let tmp = {...formData, day}
+                setFormData(tmp); 
+                props.editCallback(tmp)
+            }}
             setItems={setDdItems}
             style={styles.DrowdownStyle}
             labelStyle={{color: props.theme.text}}
+            arrowIconStyle={{tintColor: props.theme.text}} // tintColor is a property, TS is weird
             dropDownContainerStyle={{margin: 12, borderRadius: 0}}
             />
             

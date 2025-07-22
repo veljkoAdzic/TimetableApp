@@ -7,6 +7,8 @@ import { EventColorsType, EventColors } from '@/constants/EventColors'
 import EditorButtons from '@/components/editor/Buttons'
 import { DEVELOPER_MODE } from '@/constants/Settings'
 import Item from '@/components/editor/Item'
+import { storeData } from '@/utils/localStorage'
+import { router, useNavigation, useRouter } from 'expo-router'
 
 interface EditorProps {
     data?: EventData[]
@@ -29,6 +31,7 @@ const ThemeMap = new Map<string, EventColorsType>()
 export default function Editor(props: EditorProps) {
     const [data, setData] = useState<EventData[]>([])
     const [loading, setLoading] = useState(true)
+    const router = useRouter()
 
     useEffect(() =>{
         setLoading(true)
@@ -77,7 +80,6 @@ export default function Editor(props: EditorProps) {
     function editData(changes: EventData, id: number){
         let tmp = [...data]
         tmp = tmp.map((item) => item.id == id ? changes : item)
-        // tmp.push(changes)
         setData(tmp);
     }
 
@@ -90,7 +92,12 @@ export default function Editor(props: EditorProps) {
                 
                     
                     <Pressable
-                    onPress={ () => {console.log("Save")} }
+                    onPress={ () => {
+                        // SAVE
+                        storeData('eventData', JSON.stringify(data))
+                        
+                        router.push({pathname:'/', params: {refresh: Date.now().toString()}})
+                    } }
                     >
                         <Text style={[styles.button, {backgroundColor: 'lime'}]}>Save</Text>
                     </Pressable>
