@@ -3,3 +3,18 @@
 */
 
 export const DEVELOPER_MODE = true;
+
+export const API_MAP = {
+    classList: {
+        path:'/classes?',
+        paramaters: ["year", "name"]
+    },
+    lessons: {
+        path:'/timetable?',
+        paramaters: ['id', 'name']
+    },
+    teachers: {
+        path: '/teachers?',
+        paramaters: ['name']
+    }
+}

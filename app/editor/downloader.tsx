@@ -1,52 +1,11 @@
 import { View, Text, TextInput, Pressable, StyleSheet } from 'react-native'
 import { useState } from 'react'
-import { isVersionUpToDate  } from '../../utils/timetableData'
-import { loadData } from '@/utils/localStorage'
+import { getClassList  } from '../../utils/timetableData'
+import EndpointScreen from '@/screens/downloader/edpointScreen'
 
 export default function EditorScreen() {
-    const [inputValue, setInputValue] = useState('')
-
-    enum loaderStates {
-        inactive,
-        active,
-        finished
-    }
-    const [loader, setLoader] = useState(loaderStates.inactive)
     return (
-        <View style={styles.container} >
-            <TextInput 
-            placeholder='http://192.168.100.18:3000/api' 
-            inputMode='url' 
-            style={styles.input}
-            onChangeText={ (nextTxt) => setInputValue(nextTxt.trim()) }
-             />
-            
-            <Text>{ 
-                (loader == loaderStates.inactive) ? "" : 
-                (loader == loaderStates.active) ? "Loading..." : 
-                "Finished :D" 
-            }</Text>
-            
-            <Pressable 
-            onPress={ () =>{
-                setLoader(loaderStates.active)
-                isVersionUpToDate(inputValue)
-                .then(utd => {
-                    console.log('[Pressable]: ' + utd)
-                    setTimeout( () => setLoader(loaderStates.finished), 500)
-                    if(utd){
-                        //local data is up to date
-                    } else {
-                        // update data 
-                    }
-                })
-            } }
-            >
-                { ({pressed}) =>
-                <Text style={[styles.button, (pressed) ? styles.buttonActive : styles.buttonPassive]}>Check DB</Text>
-                }
-            </Pressable>
-        </View>
+        <EndpointScreen />
     )
 }
 

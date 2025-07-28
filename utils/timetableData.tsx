@@ -1,47 +1,35 @@
 import { loadData, storeData } from "./localStorage";
 import { EventData } from "@/constants/EventTypes";
+import { API_MAP, DEVELOPER_MODE } from "@/constants/Settings";
 
-const endpoints = {
-    version: '/version',
-    classes: '/classes?',
-    timetable: '/timetable?'
-}
-
-async function getData(url: string): Promise<string|null>{
-    // const data = await fetch(url)
-    // .then(x => x.json())
-    // .then(y => {return y})
-    // .catch(err => {console.error("ERROR: " + err); return null})
-
+async function getData(url: string) {
     try{
-        const resp = await fetch(url)
-        const data = await resp.json()
-        return data.data || null;
-    }
-    catch(err) {
-        console.log('[getData]: Error ' + err)
-        return null;
-    }
+        let res = await fetch(url)
+        let data = await res.json()
+        return data
+    } catch (err) {
+        console.log("[getData]:", err)
+        return null
+    }    
 }
 
-export async function isVersionUpToDate(rootURL: string){    
-    try {
-        const data = await getData(`${rootURL}${endpoints.version}`);
-        const stored = await loadData('latestVersion')
-        console.log('[isVersionUpToDate] ' + rootURL +': ' + data + " | stored: " + stored)
-        if(data == null){
-            throw `Unable to get data from ${rootURL}${endpoints.version}`
-        } else{
-            if(stored == null){
-                //await storeData('latestVersion', data)
-                console.log("[isVersionUpToDate] TEMP: storing '" + data + "' to 'latestVersion'")
-                return false;
-            } else {
-                return stored == data;
-            }
+export async function getClassList(rootURL: string){    
+    
+    const fullURL = rootURL + API_MAP.classList.path
+    let res = await getData(fullURL)
+    .then((rawJson: {label: string, value: string }) => { 
+        if(rawJson == null){
+            if(DEVELOPER_MODE)
+                console.log(`[getClassList]: Unable to get data from ${fullURL}`)
+            return []
+        } 
+
+        let res: {label: string, value: string }[] = [] 
+        for (let [value, label] of Object.entries(rawJson)) {
+            res.push({value, label})
         }
-    } catch (err) {
-        console.log("[isVersionUpToDate] Error: " + err)
-        return false;
-    }
+
+        return res
+    })
+    return res
 }
