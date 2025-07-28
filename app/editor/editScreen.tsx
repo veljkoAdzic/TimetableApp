@@ -1,5 +1,5 @@
 import { View, FlatList, Text, StyleSheet, Pressable} from 'react-native'
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useState } from 'react'
 import { DAYS, EventData } from '@/constants/EventTypes'
 import { loadData } from '@/utils/localStorage'
 import { formatEventTitle, loadThemeMap } from '@/utils/eventTools'
@@ -8,7 +8,7 @@ import EditorButtons from '@/components/editor/Buttons'
 import { DEVELOPER_MODE } from '@/constants/Settings'
 import Item from '@/components/editor/Item'
 import { storeData } from '@/utils/localStorage'
-import { router, useNavigation, useRouter } from 'expo-router'
+import { router, useRouter, useFocusEffect } from 'expo-router'
 
 interface EditorProps {
     data?: EventData[]
@@ -33,41 +33,52 @@ export default function Editor(props: EditorProps) {
     const [loading, setLoading] = useState(true)
     const router = useRouter()
 
-    useEffect(() =>{
+    useFocusEffect(
+    useCallback(()=>{ // Memoising the function
         setLoading(true)
         
+        // load the theme map into the variable
         loadThemeMap(ThemeMap)
         .then(() =>{
             if(DEVELOPER_MODE)
-                console.log("[editor2>useEffect([])]: ThemeMap loaded!")
+                console.log("[editor>useFocusEffect]: ThemeMap loaded!")
         })
         .catch(() =>{
             if(DEVELOPER_MODE)
-                console.error("[editor2>useEffect([])]: failed to load ThemeMap!")
+                console.error("[editor>useFocusEffect]: failed to load ThemeMap!")
         })
 
+        // get data from props or from storage
         if(props.data != undefined)
             setData(props.data)
         else{
             loadData('eventData')
             .then(res =>{
                 let tmp = (res)? JSON.parse(res) : []
-
+                
                 setData(tmp)
             })
         }
-
-        //populate shortTitle
+        
+        //populate shortTitle (backwards compatability)
         let tmp =[]
+        let mod = false
         for( let d of data ){
-            if(!d.shortTitle)
+            if(!d.shortTitle){
                 d.shortTitle = formatEventTitle(d.title)
+                mod = true
+            }
             tmp.push(d)
         }
-        setData(tmp)
+        if(mod)
+            setData(tmp)
 
         setLoading(false);
+
+        return () =>{} // must return function
+
     }, [])
+    );
 
     if(loading){
         return (
@@ -95,7 +106,6 @@ export default function Editor(props: EditorProps) {
                     onPress={ () => {
                         // SAVE
                         storeData('eventData', JSON.stringify(data))
-                        
                         router.push({pathname:'/', params: {refresh: Date.now().toString()}})
                     } }
                     >
@@ -103,7 +113,10 @@ export default function Editor(props: EditorProps) {
                     </Pressable>
 
                     <Pressable
-                    onPress={ () => {console.log("Discard")} }
+                    onPress={ () => {
+                        // DISCARD
+                        router.push({pathname:'/'})
+                    } }
                     >
                         <Text style={[styles.button, {backgroundColor: 'red'}]}>Discard</Text>
                     </Pressable>
