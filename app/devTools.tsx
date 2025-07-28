@@ -3,7 +3,6 @@ import { DEVELOPER_MODE } from "@/constants/Settings"
 import { clearStorage, listStoredData, storeData } from "@/utils/localStorage"
 import { useState } from "react"
 import { View, Text, StyleSheet, Pressable, FlatList, ScrollView, Modal } from "react-native" 
-import { ColorProperties } from "react-native-reanimated/lib/typescript/Colors"
 
 function Table(props:{header: string[], data: Map<string, string>}){
     const tableStyle = StyleSheet.create({
@@ -89,6 +88,7 @@ function generateDummyData(){
         startTime: [8, 0],
         endTime: [10, 45],
         location: "AMF PED",
+        teacher: 'Prof a',
         extra_descriptions: ["Prof a"]
     },
 
@@ -99,6 +99,7 @@ function generateDummyData(){
         startTime: [11, 0],
         endTime: [12, 45],
         location: "AMF PED",
+        teacher: 'Prof b',
         extra_descriptions: ["Prof b"]
     },
     {
@@ -108,6 +109,7 @@ function generateDummyData(){
         startTime: [14, 0],
         endTime: [15, 30],
         location: "2",
+        teacher: 'Prof c',
         extra_descriptions: ["labs"]
     },
 
@@ -118,6 +120,7 @@ function generateDummyData(){
         startTime: [15, 30],
         endTime: [17, 0],
         location: "215",
+        teacher: 'Prof d',
         extra_descriptions: ["labs"]
     },
 
@@ -128,6 +131,7 @@ function generateDummyData(){
         startTime: [18, 30],
         endTime: [20, 0],
         location: "2",
+        teacher: 'Prof a / Prof e',
         extra_descriptions: ["labs"]
     },
 
@@ -138,6 +142,7 @@ function generateDummyData(){
         startTime: [15, 30],
         endTime: [17, 0],
         location: "215",
+        teacher: 'Prof e / Prof h / Prof a',
         extra_descriptions: ["labs"]
     },
 
@@ -148,6 +153,7 @@ function generateDummyData(){
         startTime: [17, 0],
         endTime: [19, 45],
         location: "AMF PED",
+        teacher: 'Prof a',
         extra_descriptions: ["Asis a"]
     },
 
@@ -158,6 +164,7 @@ function generateDummyData(){
         startTime: [10, 0],
         endTime: [11, 45],
         location: "223",
+        teacher: 'Prof a',
         extra_descriptions: ["Prof c"]
     },
 
@@ -168,6 +175,7 @@ function generateDummyData(){
         startTime: [12, 0],
         endTime: [12, 45],
         location: "223",
+        teacher: 'Prof a',
         extra_descriptions: ["Asis b"]
     },
 
@@ -178,6 +186,7 @@ function generateDummyData(){
         startTime: [12, 0],
         endTime: [13, 45],
         location: "FINKI AMF G",
+        teacher: 'Prof a',
         extra_descriptions: ["Asis b"]
     },
     {
@@ -187,6 +196,7 @@ function generateDummyData(){
         startTime: [14, 0],
         endTime: [15, 45],
         location: "FINKI AMF G",
+        teacher: 'Prof a',
         extra_descriptions: ["Prof c"]
     },
     {
@@ -196,6 +206,7 @@ function generateDummyData(){
         startTime: [12, 30],
         endTime: [14, 0],
         location: "138",
+        teacher: 'Prof a',
         extra_descriptions: ["labs"]
     },
     {
@@ -205,6 +216,7 @@ function generateDummyData(){
         startTime: [14, 0],
         endTime: [15, 45],
         location: "AMF PED",
+        teacher: 'Prof a',
         extra_descriptions: ["asis d"]
     },
     {
@@ -214,6 +226,7 @@ function generateDummyData(){
         startTime: [16, 0],
         endTime: [17, 45],
         location: "AMF PED",
+        teacher: 'Prof a',
         extra_descriptions: ["prof d"]
     },
     {
@@ -223,6 +236,7 @@ function generateDummyData(){
         startTime: [18, 0],
         endTime: [19, 45],
         location: "AMF PED",
+        teacher: 'Prof a',
         extra_descriptions: ["asis d"]
     },
     ]

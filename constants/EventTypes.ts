@@ -6,6 +6,7 @@ export interface EventData {
     endTime: number[],
     location: string,
     extra_descriptions?: string[],
+    teacher: string,
 
     shortTitle?: string,
     id: number

@@ -16,7 +16,6 @@ export default function Form(props: {data: EventData, theme: EventColorsType, ed
         {label: 'Wednesday', value: 'WED'},
         {label: 'Thursday', value: 'THU'},
         {label: 'Friday', value: 'FRI'},
-        {label: 'Other', value: '-'}
     ])
     const [dropdownValue, setDropdownValue] = useState(formData.day);
 
@@ -26,16 +25,13 @@ export default function Form(props: {data: EventData, theme: EventColorsType, ed
     const [EndTime, setEndTime] = useState(new Time(formData.endTime))
     const [endTimeVisible, setEndTimeVisible] = useState(false)
 
-    useEffect(()=>{
-        setStartTime(new Time(formData.startTime))
-    },[])
-
     const showStartTimePicker = () => {
         setStartTimeVisible(true);
     }
 
     return (
         <View>
+            {/* FullName TextInput */}
             <TextInput
             style={[styles.input, {color: props.theme.text}]}
             onChangeText={(title) => { 
@@ -53,6 +49,7 @@ export default function Form(props: {data: EventData, theme: EventColorsType, ed
             placeholder='Class name'
             />
 
+            {/* ShortName TextInput */}
             <TextInput
             style={[styles.input, {color: props.theme.text}]}
             onChangeText={(shortTitle) => { 
@@ -70,6 +67,7 @@ export default function Form(props: {data: EventData, theme: EventColorsType, ed
             placeholder='Display name'
             />
 
+            {/* Location TextInput */}
             <TextInput
             style={[styles.input, {color: props.theme.text}]}
             onChangeText={(location) => { 
@@ -87,6 +85,25 @@ export default function Form(props: {data: EventData, theme: EventColorsType, ed
             placeholder='Location'
             />
 
+            {/* Teachers TextInput */}
+            <TextInput
+            style={[styles.input, {color: props.theme.text}]}
+            onChangeText={(teacher) => { 
+                let tmp = {...formData, teacher};
+                setFormData(tmp)
+            }
+            }
+            onEndEditing={ ()=>{
+                let tmp = {...formData}
+                tmp.teacher = tmp.teacher!.trim()
+                setFormData(tmp)
+                props.editCallback(formData)
+            } }
+            value={formData.teacher}
+            placeholder='Teacher'
+            />
+
+            {/* StartTime Input */}
             <View style={styles.TimeSection}>
                 <Text style={[{fontSize: 20, paddingHorizontal: 5, color: props.theme.text}]}>Start Time</Text>
 
@@ -117,6 +134,7 @@ export default function Form(props: {data: EventData, theme: EventColorsType, ed
                 />}
             </View>
 
+            {/* EndTime Input */}
             <View style={styles.TimeSection}>
                 <Text style={[{fontSize: 20, paddingHorizontal: 5, color: props.theme.text}]}>End Time</Text>
 
@@ -147,6 +165,7 @@ export default function Form(props: {data: EventData, theme: EventColorsType, ed
                 />}
             </View>
 
+            {/* Day Dropdown */}
             <DropDownPicker 
             open={dropdownOpen} 
             value={dropdownValue}

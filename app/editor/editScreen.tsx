@@ -134,8 +134,8 @@ export default function Editor(props: EditorProps) {
                 <Title text ={item} />
                 <View style={styles.itemContainer}>
                     {
-                        data.filter((event) => (index != sections.length-1 && event.day == DAYS[index]) || 
-                                                (index == sections.length-1 && !DAYS.includes(event.day))
+                        data.filter((event) => (index != sections.length-2 && event.day == DAYS[index]) || 
+                                                (index == sections.length-2 && !DAYS.includes(event.day))
                                     )
                         .map((tile, j) => {
                             return <Item key={tile.id} data={tile} ThemeMap={ThemeMap} editCallback={editData}/>
