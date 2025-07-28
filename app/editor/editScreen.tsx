@@ -96,6 +96,12 @@ export default function Editor(props: EditorProps) {
         setData(tmp);
     }
 
+    function deleteElemenet(id: number){
+        // let tmp = [...data]
+        let tmp = data.filter((item, ind) => item.id != id )
+        setData(tmp)
+    }
+
     const renderSections = ({item, index}: {item:string, index: number}) => {
         if(item == SECTIONS_END){
             return(
@@ -138,7 +144,7 @@ export default function Editor(props: EditorProps) {
                                                 (index == sections.length-2 && !DAYS.includes(event.day))
                                     )
                         .map((tile, j) => {
-                            return <Item key={tile.id} data={tile} ThemeMap={ThemeMap} editCallback={editData}/>
+                            return <Item key={tile.id} data={tile} ThemeMap={ThemeMap} editCallback={editData} deleteCallback={deleteElemenet}/>
                         })
                     }
                 </View>

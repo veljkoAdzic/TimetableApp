@@ -32,13 +32,13 @@ export const ConfirmationDialog = (props: ConfirmDialogProps) => {
                     <View style={styles.btnContainer}>
                         <Pressable style={{padding: 10}}
                             onPress={() => { props.Cancel()  }}>
-                                <Text style={props.CancelStyle || [styles.button, {backgroundColor: 'red'}]}>
+                                <Text style={[styles.button, {backgroundColor: 'red'}, props.CancelStyle]}>
                                     {props.CancelText || "Cancel"}
                                     </Text>
                         </Pressable>
                         <Pressable style={{padding: 10}}
                             onPress={() => { props.OK()  }}>
-                                <Text style={props.OKstyle || [styles.button, {backgroundColor: 'green'}]}>
+                                <Text style={[styles.button, {backgroundColor: 'green'}, props.OKstyle]}>
                                     {props.OKtext || "OK"}
                                     </Text>
                         </Pressable>

@@ -29,8 +29,69 @@ export default function Form(props: {data: EventData, theme: EventColorsType, ed
         setStartTimeVisible(true);
     }
 
+    const saveTitle = () => {
+        let tmp = {...formData}
+        tmp.title = tmp.title.trim()
+        setFormData(tmp)
+        props.editCallback(tmp)
+    }
+    const saveShortText = () => {
+        let tmp = {...formData}
+        tmp.shortTitle = tmp.shortTitle!.trim()
+        setFormData(tmp)
+        props.editCallback(tmp)
+    }
+    const saveLocation = () => {
+        let tmp = {...formData}
+        tmp.location = tmp.location.trim()
+        setFormData(tmp)
+        props.editCallback(tmp)
+    }
+    const saveTeacher =  () => {
+        let tmp = {...formData}
+        tmp.teacher = tmp.teacher!.trim()
+        setFormData(tmp)
+        props.editCallback(tmp)
+    }
+    const saveStartTime = (ev: any, selected: Date | undefined) => {
+        if (selected == undefined) return;
+
+        const curr = new Time(selected)
+        setStartTimeVisible(false);
+
+        setStartTime(curr)
+        
+        const startTime = [curr.hours, curr.minutes]
+        let tmp = {...formData, startTime}
+
+        setFormData(tmp);
+
+        props.editCallback(tmp)
+    }
+    const saveEndTime = (ev: any, selected: Date | undefined) => {
+        if (selected == undefined) return;
+
+        const curr = new Time(selected)
+        setEndTimeVisible(false);
+
+        setEndTime(curr)
+        
+        const endTime = [curr.hours, curr.minutes]
+        let tmp = {...formData, endTime}
+
+        setFormData(tmp);
+
+        props.editCallback(tmp) 
+    }
+    const saveDay = (day: string | null) => {
+        if (day == null) return; 
+        let tmp = {...formData, day}
+        setFormData(tmp); 
+        props.editCallback(tmp)
+    }
+
     return (
-        <View>
+        <View style={{padding: 35, paddingBottom: 18}}>
             {/* FullName TextInput */}
             <TextInput
             style={[styles.input, {color: props.theme.text}]}
@@ -39,12 +100,7 @@ export default function Form(props: {data: EventData, theme: EventColorsType, ed
                 setFormData(tmp)
             }
             }
-            onEndEditing={ ()=>{
-                let tmp = {...formData}
-                tmp.title = tmp.title.trim()
-                setFormData(tmp)
-                props.editCallback(formData)
-            } }
+            onEndEditing={saveTitle}
             value={formData.title}
             placeholder='Class name'
             />
@@ -57,12 +113,7 @@ export default function Form(props: {data: EventData, theme: EventColorsType, ed
                 setFormData(tmp)
             }
             }
-            onEndEditing={ ()=>{
-                let tmp = {...formData}
-                tmp.shortTitle = tmp.shortTitle!.trim()
-                setFormData(tmp)
-                props.editCallback(formData)
-            } }
+            onEndEditing={ saveShortText }
             value={formData.shortTitle}
             placeholder='Display name'
             />
@@ -75,12 +126,7 @@ export default function Form(props: {data: EventData, theme: EventColorsType, ed
                 setFormData(tmp)
             }
             }
-            onEndEditing={ ()=>{
-                let tmp = {...formData}
-                tmp.location = tmp.location.trim()
-                setFormData(tmp)
-                props.editCallback(formData)
-            } }
+            onEndEditing={ saveLocation }
             value={formData.location}
             placeholder='Location'
             />
@@ -93,12 +139,7 @@ export default function Form(props: {data: EventData, theme: EventColorsType, ed
                 setFormData(tmp)
             }
             }
-            onEndEditing={ ()=>{
-                let tmp = {...formData}
-                tmp.teacher = tmp.teacher!.trim()
-                setFormData(tmp)
-                props.editCallback(formData)
-            } }
+            onEndEditing={ saveTeacher }
             value={formData.teacher}
             placeholder='Teacher'
             />
@@ -116,21 +157,7 @@ export default function Form(props: {data: EventData, theme: EventColorsType, ed
                 value={StartTime.toDate()} 
                 mode={'time'}
                 is24Hour={true}
-                onChange={(ev, selected) => {
-                    if (selected == undefined) return;
-
-                    const curr = new Time(selected)
-                    setStartTimeVisible(false);
-
-                    setStartTime(curr)
-                    
-                    const startTime = [curr.hours, curr.minutes]
-                    let tmp = {...formData, startTime}
-
-                    setFormData(tmp);
-
-                    props.editCallback(tmp) // IDK WHYYYY but when using formData it isn't updating
-                }}
+                onChange={saveStartTime}
                 />}
             </View>
 
@@ -147,21 +174,7 @@ export default function Form(props: {data: EventData, theme: EventColorsType, ed
                 value={EndTime.toDate()} 
                 mode={'time'}
                 is24Hour={true}
-                onChange={(ev, selected) => {
-                    if (selected == undefined) return;
-
-                    const curr = new Time(selected)
-                    setEndTimeVisible(false);
-
-                    setEndTime(curr)
-                    
-                    const endTime = [curr.hours, curr.minutes]
-                    let tmp = {...formData, endTime}
-
-                    setFormData(tmp);
-
-                    props.editCallback(tmp) // IDK WHYYYY but when using formData it isn't updating
-                }}
+                onChange={saveEndTime}
                 />}
             </View>
 
@@ -172,19 +185,13 @@ export default function Form(props: {data: EventData, theme: EventColorsType, ed
             items={ddItems}
             setOpen={setDropdownOpen}
             setValue={setDropdownValue}
-            onChangeValue={(day: string | null) => {
-                if (day == null) return; 
-                let tmp = {...formData, day}
-                setFormData(tmp); 
-                props.editCallback(tmp)
-            }}
+            onChangeValue={saveDay}
             setItems={setDdItems}
             style={styles.DrowdownStyle}
             labelStyle={{color: props.theme.text}}
             arrowIconStyle={{tintColor: props.theme.text}} // tintColor is a property, TS is weird
             dropDownContainerStyle={{margin: 12, borderRadius: 0}}
-            />
-            
+            />            
         </View>
     )
 }

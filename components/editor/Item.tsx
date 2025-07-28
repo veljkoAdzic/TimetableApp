@@ -3,23 +3,25 @@ import { EventData} from "@/constants/EventTypes";
 import { EventColors, EventColorsType } from "@/constants/EventColors";
 import { Pressable, View, Text, Modal, StyleSheet } from "react-native";
 import Form from "./Form";
+import { ConfirmationDialog } from "../ConfirmationDialog";
+import {MaterialCommunityIcons} from '@expo/vector-icons'
 
-
-export default function Item(props: {data: EventData, ThemeMap: Map<string, EventColorsType>, editCallback: (data: EventData, id: number) => void}) {
+export default function Item(props: {data: EventData, ThemeMap: Map<string, EventColorsType>, editCallback: (data: EventData, id: number) => void, deleteCallback: (id: number) => void}) {
     const [data, setData] = useState(props.data)
     const [modalVisible, setModalVisible] = useState(false);
+    const [cdVisible, setCDvisible] = useState(false);
     const [theme, setTheme] = useState<EventColorsType>({...props.ThemeMap.get(data.location)!})
 
     function setEdits(edited: EventData){ // callback for form editing
-        setData(edited)
-
         if (!props.ThemeMap.has(edited.location)){
             const index = props.ThemeMap.size % EventColors.length
-            props.ThemeMap.set(data.location, EventColors[index])
+            props.ThemeMap.set(edited.location, EventColors[index])
         }
-        setTheme({...props.ThemeMap.get(data.location)!})
-
-        props.editCallback(data, data.id);
+        setTheme({...props.ThemeMap.get(edited.location)!})
+        
+        if(edited.day == data.day)
+            props.editCallback(edited, edited.id);
+        setData(edited)
     }
 
     return(
@@ -33,6 +35,18 @@ export default function Item(props: {data: EventData, ThemeMap: Map<string, Even
             </View>
         </Pressable>
         
+        { cdVisible ?
+        <ConfirmationDialog
+        OK={()=>{
+            setCDvisible(false)
+            props.deleteCallback(data.id)
+        }}
+        OKtext="Delete"
+        Cancel={()=>{ setCDvisible(false) }}>
+            Are you sure you want to delete this class?
+        </ConfirmationDialog>
+        : <></>
+        }
 
         <Modal
         animationType="fade"
@@ -40,6 +54,7 @@ export default function Item(props: {data: EventData, ThemeMap: Map<string, Even
         visible={modalVisible}
         onRequestClose={() => {
             setModalVisible(!modalVisible);
+            props.editCallback(data, data.id);
         }}
         >
         <View style={styles.centeredView}>
@@ -55,6 +70,22 @@ export default function Item(props: {data: EventData, ThemeMap: Map<string, Even
             <View style={[styles.modalView, {backgroundColor: theme.background, borderColor: theme.border}]}>
 
             <Form data={data} theme={theme} editCallback={setEdits} />
+
+            <View style={styles.editBar}>
+                <Pressable
+                onPress={() =>{ setModalVisible(false) }}
+                style={styles.editBarButton}
+                >
+                    <MaterialCommunityIcons name="content-save" size={28} color={theme.text} />
+                </Pressable>
+                
+                <Pressable
+                onPress={() =>{ setCDvisible(true) }}
+                style={styles.editBarButton}
+                >
+                    <MaterialCommunityIcons name="delete" size={28} color={theme.text} />
+                </Pressable>
+            </View>
 
             </View>
         </View>
@@ -83,10 +114,24 @@ const styles = StyleSheet.create({
         margin: 20,
         backgroundColor: 'white',
         borderRadius: 20,
-        padding: 35,
+        padding: 0,//35,
         paddingBottom: 0,
         alignItems: 'center',
         elevation: 5,
-        width: "80%"
+        width: "80%",
     },
+    editBar: {
+        paddingVertical: 5,
+        flexDirection:'row', 
+        alignItems: 'center', 
+        justifyContent: 'space-around',
+        backgroundColor: '#FFF3',
+        width: '100%',
+        borderBottomLeftRadius: 20,
+        borderBottomRightRadius: 20,
+        borderTopWidth: 1,
+    },
+    editBarButton: {
+        padding: 10,
+    }
 })
