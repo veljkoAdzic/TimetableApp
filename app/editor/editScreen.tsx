@@ -9,6 +9,7 @@ import { DEVELOPER_MODE } from '@/constants/Settings'
 import Item from '@/components/editor/Item'
 import { storeData } from '@/utils/localStorage'
 import { router, useRouter, useFocusEffect } from 'expo-router'
+import { ConfirmationDialog } from '@/components/ConfirmationDialog'
 
 interface EditorProps {
     data?: EventData[]
@@ -31,6 +32,7 @@ const ThemeMap = new Map<string, EventColorsType>()
 export default function Editor(props: EditorProps) {
     const [data, setData] = useState<EventData[]>([])
     const [loading, setLoading] = useState(true)
+    const [cdVisible, setCDvisible] = useState(false)
     const router = useRouter()
 
     useFocusEffect(
@@ -115,7 +117,7 @@ export default function Editor(props: EditorProps) {
                     <Pressable
                     onPress={ () => {
                         // DISCARD
-                        router.push({pathname:'/'})
+                        setCDvisible(true)
                     } }
                     >
                         <Text style={[styles.button, {backgroundColor: 'red'}]}>Discard</Text>
@@ -146,6 +148,21 @@ export default function Editor(props: EditorProps) {
     
     return (
         <View style={styles.container}>
+
+            { cdVisible ?
+            <ConfirmationDialog
+            OK={()=>{
+                setCDvisible(false)
+                router.push({pathname:'/'})
+            }}
+            Cancel={() =>{ setCDvisible(false) }}
+            >
+                Discard all changes?
+            </ConfirmationDialog>
+             :
+            <></>
+            }
+            
             <FlatList style={styles.scrollContainer} contentContainerStyle={{paddingBottom: 100}}
             data={sections}
             initialNumToRender={4}

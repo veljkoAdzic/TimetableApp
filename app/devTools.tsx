@@ -1,3 +1,4 @@
+import { ConfirmationDialog } from "@/components/ConfirmationDialog"
 import { DEVELOPER_MODE } from "@/constants/Settings"
 import { clearStorage, listStoredData, storeData } from "@/utils/localStorage"
 import { useState } from "react"
@@ -254,12 +255,9 @@ export default function DevScreen(){
             </View>
 
             <View>
-            <Pressable 
+                <Pressable 
                 onPress={ () =>{
                     setAsModalVisible(true)
-                    // clearStorage().then(() => {
-                    //     console.log("Async Storage cleared!")
-                    // })
                 } }
                 >
                     { ({pressed}) =>
@@ -268,43 +266,25 @@ export default function DevScreen(){
                 </Pressable>
 
 
-                <Modal
-                animationType="slide"
-                transparent={true}  
-                visible={asModalVisible}
-                onRequestClose={() => {
-                    // Alert.alert('Modal has been closed.');
-                    setAsModalVisible(!asModalVisible);
-                }}>
-                <View style={styles.centeredView}>
-                    <View style={styles.modalView}>
-                    <Text style={{textAlign: 'center', marginBottom: 20, fontSize: 22}}>
+                {
+                    asModalVisible ?
+                    <ConfirmationDialog
+                    OK={() =>{
+                        clearStorage().then(() => {
+                            console.log("Async Storage cleared!")
+                        })
+                        setAsModalVisible(false)
+                    }}
+                    OKtext="Delete"
+                    OKstyle={{backgroundColor: 'red', padding: 15, borderRadius: 10,color: '#FFF', fontSize: 20}}
+                    Cancel={() =>{ setAsModalVisible(false) }}
+                    CancelStyle={{backgroundColor: '#fbdedeff', color: 'red', fontSize: 20, padding: 15, borderRadius: 10, marginRight: 20}}
+                    >
                         Delete Async Storage?
-                        </Text>
-                    <View style={{flexDirection: 'row'}}>
-                        <Pressable
-                            style={{backgroundColor: '#FFE9E9', padding: 15, borderRadius: 10, marginRight: 20}}
-                            onPress={() => setAsModalVisible(false)}>
-                            <Text style={{color: 'red', fontSize: 20}}>Cancel</Text>
-                        </Pressable>
-
-                        <Pressable
-                            style={{backgroundColor: 'red', padding: 15, borderRadius: 10}}
-                            onPress={() => {
-                                clearStorage().then(() => {
-                                    console.log("Async Storage cleared!")
-                                })
-                                setAsModalVisible(false)
-                            }
-                        }>
-                            <Text style={{color: '#FFF', fontSize: 20}}>Delete</Text>
-                        </Pressable>
-                    </View>
-
-                    </View>
-                </View>
-                </Modal>
-
+                    </ConfirmationDialog>
+                    :
+                    <></>
+                }
             </View>
 
             <View>
