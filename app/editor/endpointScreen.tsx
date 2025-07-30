@@ -1,6 +1,7 @@
 import { View, Text, TextInput, Pressable, StyleSheet } from 'react-native'
 import { useState } from 'react'
 import { getClassList  } from '../../utils/timetableData'
+import { useRouter } from 'expo-router'
 
 enum loaderStates {
     inactive,
@@ -11,7 +12,7 @@ enum loaderStates {
 export default function EndpointScreen() {
     const [inputValue, setInputValue] = useState('http://192.168.100.18:369/api')  
     const [loader, setLoader] = useState(loaderStates.inactive)
-
+    const router = useRouter()
     return (
         <View style={styles.container} >
             <TextInput 
@@ -38,6 +39,7 @@ export default function EndpointScreen() {
                         console.log(c.value, c.label)
                     }
                     setLoader(loaderStates.finished)
+                    router.navigate('/editor/downloader2')
                 })
             } }
             >

@@ -26,7 +26,7 @@ export default function Index() {
 
     return (
     <View style={styles.container} >
-        <TimetableScreen reload={reload} />
+        <TimetableScreen />
     </View>
     )
 }

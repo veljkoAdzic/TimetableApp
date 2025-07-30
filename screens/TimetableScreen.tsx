@@ -1,9 +1,10 @@
 import { View, Text, StyleSheet } from 'react-native'
 import  Grid  from '@/components/Grid'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { loadData, storeData } from '@/utils/localStorage'
 import { EventData } from '@/constants/EventTypes'
 import { DEVELOPER_MODE } from '@/constants/Settings'
+import { useLocalSearchParams } from 'expo-router'
 
 function SideBar(){
     return(
@@ -20,12 +21,24 @@ function SideBar(){
 
 
 
-export default function TimetableScreen(props: {reload?: boolean}){
+export default function TimetableScreen(){
     const [loadingEvents, setLoadingEvents] = useState(true)
     const [events_data, setEventData] = useState<EventData[] | null>(null)
 
+    const {refresh} = useLocalSearchParams()
+    const [reload, setReload] = useState(false)
+    const handleRefresh = useRef<string | string[] | null>(null);
+
     useEffect(()=>{
-        if(props.reload){
+        if(refresh && handleRefresh.current !== refresh){
+            setReload(true)
+            handleRefresh.current = refresh
+        }
+    },[refresh])
+
+    useEffect(()=>{
+        if(reload){
+            setLoadingEvents(true)
             loadData('eventData')
             .then((res) => {
                 if(DEVELOPER_MODE)
@@ -34,10 +47,14 @@ export default function TimetableScreen(props: {reload?: boolean}){
                 setEventData(data)
                 setLoadingEvents(false);
             })
+            setTimeout(() =>{
+                setReload(false)
+            }, 80)
         }
-    },[props.reload])
+    },[reload])
         
     useEffect(() =>{
+        setLoadingEvents(true)
         if(events_data){
             const tmp = async () => {
                 await storeData('eventData', JSON.stringify(events_data))
@@ -74,7 +91,7 @@ export default function TimetableScreen(props: {reload?: boolean}){
         <View style={styles.ttContainer}>
             <SideBar />
             <View style={styles.gridContainer}>
-                <Grid events={events_data!} />
+                <Grid events={events_data!}/>
             </View>
         </View>
     )

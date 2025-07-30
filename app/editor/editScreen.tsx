@@ -2,7 +2,7 @@ import { View, FlatList, Text, StyleSheet, Pressable} from 'react-native'
 import React, { useCallback, useState } from 'react'
 import { DAYS, EventData } from '@/constants/EventTypes'
 import { loadData } from '@/utils/localStorage'
-import { formatEventTitle, loadThemeMap } from '@/utils/eventTools'
+import { formatEventTitle, generateID, loadThemeMap } from '@/utils/eventTools'
 import { EventColorsType, EventColors } from '@/constants/EventColors'
 import EditorButtons from '@/components/editor/Buttons'
 import { DEVELOPER_MODE } from '@/constants/Settings'
@@ -34,6 +34,7 @@ export default function Editor(props: EditorProps) {
     const [loading, setLoading] = useState(true)
     const [cdVisible, setCDvisible] = useState(false)
     const router = useRouter()
+    let [openTileId, setOpenTileId] = useState<number | null>(null);
 
     useFocusEffect(
     useCallback(()=>{ // Memoising the function
@@ -93,6 +94,8 @@ export default function Editor(props: EditorProps) {
     function editData(changes: EventData, id: number){
         let tmp = [...data]
         tmp = tmp.map((item) => item.id == id ? changes : item)
+        if (openTileId == id)
+            setOpenTileId(null)
         setData(tmp);
     }
 
@@ -100,6 +103,28 @@ export default function Editor(props: EditorProps) {
         // let tmp = [...data]
         let tmp = data.filter((item, ind) => item.id != id )
         setData(tmp)
+    }
+
+    function createNewLesson(){
+        let id = generateID(data)
+        if (!id) return
+
+        let newLesson: EventData = {
+            id,
+            title: "",
+            shortTitle: '',
+            location: '',
+            teacher: '',
+            startTime: [8, 0],
+            endTime: [8, 45],
+            day: "MON",
+        }
+        let tmp = [...data]
+        tmp.push(newLesson)
+        setOpenTileId(id)
+        setData(tmp)
+        
+
     }
 
     const renderSections = ({item, index}: {item:string, index: number}) => {
@@ -114,6 +139,8 @@ export default function Editor(props: EditorProps) {
                     onPress={ () => {
                         // SAVE
                         storeData('eventData', JSON.stringify(data))
+                        storeData('ThemeMap', JSON.stringify([...ThemeMap]))
+                        
                         router.push({pathname:'/', params: {refresh: Date.now().toString()}})
                     } }
                     >
@@ -144,7 +171,12 @@ export default function Editor(props: EditorProps) {
                                                 (index == sections.length-2 && !DAYS.includes(event.day))
                                     )
                         .map((tile, j) => {
-                            return <Item key={tile.id} data={tile} ThemeMap={ThemeMap} editCallback={editData} deleteCallback={deleteElemenet}/>
+                            let flag = false
+                            if(openTileId){
+                                console.log(`[editScreen]: opening: ${openTileId}`)
+                                flag = tile.id == openTileId
+                            }
+                            return <Item key={tile.id} data={tile} ThemeMap={ThemeMap} editCallback={editData} deleteCallback={deleteElemenet} opened={flag}/>
                         })
                     }
                 </View>
@@ -174,7 +206,7 @@ export default function Editor(props: EditorProps) {
             initialNumToRender={4}
             renderItem={ renderSections } />
 
-            <EditorButtons />
+            <EditorButtons editButtonFunction={createNewLesson}/>
         </View>
     )
 }

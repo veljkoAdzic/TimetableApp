@@ -3,9 +3,10 @@ import EventBlock from './EventBlock'
 import { EventData } from '../constants/EventTypes'
 import { EventColorsType, EventColors } from '@/constants/EventColors'
 import { formatEventTitle, loadThemeMap } from '@/utils/eventTools'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { storeData } from '@/utils/localStorage'
 import { DEVELOPER_MODE } from '@/constants/Settings'
+import { useLocalSearchParams } from 'expo-router'
 const edngeCases = (i: number, j: number) => {
     let res = {
         borderTopWidth: 0,
@@ -25,21 +26,22 @@ interface GridProps extends React.ComponentProps<typeof View> {
 }
 
 const ThemeMap = new Map<string, EventColorsType>();
-// const getTheme = (location: string) => {
-//     if(!ThemeMap.has(location)){
-//         if(DEVELOPER_MODE)
-//             console.log('[getTheme]: Miss ' + location) // debugging
-//         const index = ThemeMap.size % EventColors.length
-//         ThemeMap.set(location, EventColors[index])
-//     }else if(DEVELOPER_MODE)
-//         console.log('[getTheme]: Hit ' + location) // temp
-//     return ThemeMap.get(location)! // ! is so that null is not returned
-// }
 
 export default function Grid(props: GridProps){
     const [themeLoaded, setLoaded] = useState(false)
 
-    useEffect(() =>{
+    const {refresh} = useLocalSearchParams()
+    const [reload, setReload] = useState(false)
+    const handleRefresh = useRef<string | string[] | null>(null);
+
+    useEffect(()=>{
+        if(refresh && handleRefresh.current !== refresh){
+            setReload(true)
+            handleRefresh.current = refresh
+        }
+    },[refresh])
+
+    const loadData = () => {
         let modified = false;
         setLoaded(false);
         loadThemeMap(ThemeMap).then(() => {
@@ -76,7 +78,18 @@ export default function Grid(props: GridProps){
                 storeData('eventData', JSON.stringify(props.events))
             }
         })
+    }
+
+    useEffect(() =>{
+        loadData()
     },[])
+
+    useEffect(()=>{
+        if(reload){
+            loadData()
+            setReload(false)
+        }
+    },[reload])
     
     if(!themeLoaded){
         return (

@@ -8,8 +8,9 @@ export default function EditScreen(){
                 headerShown: false
             }}
         >
-            <Stack.Screen name="downloader" />
             <Stack.Screen name="editScreen" />
+            <Stack.Screen name="endpointScreen" />
+            <Stack.Screen name="downloader2" />
         </Stack>
     )
 }

@@ -1,5 +1,11 @@
 const transparentBorder = '#00000001';
 
+export const DefaultEventColor = { 
+        background: '#AAA',
+        border: transparentBorder,
+        text: 'black'
+    }
+
 export const EventColors = [
     { //yellow
         background: '#e6c232',

@@ -1,26 +1,39 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { EventData} from "@/constants/EventTypes";
-import { EventColors, EventColorsType } from "@/constants/EventColors";
+import { EventColors, EventColorsType, DefaultEventColor } from "@/constants/EventColors";
 import { Pressable, View, Text, Modal, StyleSheet } from "react-native";
 import Form from "./Form";
 import { ConfirmationDialog } from "../ConfirmationDialog";
 import {MaterialCommunityIcons} from '@expo/vector-icons'
 
-export default function Item(props: {data: EventData, ThemeMap: Map<string, EventColorsType>, editCallback: (data: EventData, id: number) => void, deleteCallback: (id: number) => void}) {
+export default function Item(props: {data: EventData, ThemeMap: Map<string, EventColorsType>, editCallback: (data: EventData, id: number) => void, deleteCallback: (id: number) => void, opened?: boolean}) {
     const [data, setData] = useState(props.data)
-    const [modalVisible, setModalVisible] = useState(false);
+    const [modalVisible, setModalVisible] = useState(props.opened || false);
     const [cdVisible, setCDvisible] = useState(false);
-    const [theme, setTheme] = useState<EventColorsType>({...props.ThemeMap.get(data.location)!})
+    const [theme, setTheme] = useState<EventColorsType>(DefaultEventColor)
+
+    useEffect(() =>{
+        if(data.location.length == 0) return
+
+        if (!props.ThemeMap.has(data.location)){
+            const index = props.ThemeMap.size % EventColors.length
+            props.ThemeMap.set(data.location, EventColors[index])
+        }
+        setTheme({...props.ThemeMap.get(data.location)!})
+    }, [])
 
     function setEdits(edited: EventData){ // callback for form editing
-        if (!props.ThemeMap.has(edited.location)){
-            const index = props.ThemeMap.size % EventColors.length
-            props.ThemeMap.set(edited.location, EventColors[index])
+        if(edited.location.length != 0) {
+            if (!props.ThemeMap.has(edited.location)){
+                const index = props.ThemeMap.size % EventColors.length
+                props.ThemeMap.set(edited.location, EventColors[index])        
+            }
+            setTheme({...props.ThemeMap.get(edited.location)!})
         }
-        setTheme({...props.ThemeMap.get(edited.location)!})
-        
+
         if(edited.day == data.day)
             props.editCallback(edited, edited.id);
+        
         setData(edited)
     }
 
@@ -39,6 +52,7 @@ export default function Item(props: {data: EventData, ThemeMap: Map<string, Even
         <ConfirmationDialog
         OK={()=>{
             setCDvisible(false)
+            setEdits(data)
             props.deleteCallback(data.id)
         }}
         OKtext="Delete"
@@ -73,7 +87,7 @@ export default function Item(props: {data: EventData, ThemeMap: Map<string, Even
 
             <View style={styles.editBar}>
                 <Pressable
-                onPress={() =>{ setModalVisible(false) }}
+                onPress={() =>{ setEdits(data); setModalVisible(false);  }}
                 style={styles.editBarButton}
                 >
                     <MaterialCommunityIcons name="content-save" size={28} color={theme.text} />
