@@ -25,6 +25,13 @@ export default function Form(props: {data: EventData, theme: EventColorsType, ed
     const [EndTime, setEndTime] = useState(new Time(formData.endTime))
     const [endTimeVisible, setEndTimeVisible] = useState(false)
 
+    useEffect(() => {
+        setFormData(props.data);
+        setDropdownValue(props.data.day);
+        setStartTime(new Time(props.data.startTime));
+        setEndTime(new Time(props.data.endTime));
+    }, [props.data]);
+
     const showStartTimePicker = () => {
         setStartTimeVisible(true);
     }

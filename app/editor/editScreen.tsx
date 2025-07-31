@@ -1,6 +1,6 @@
 import { View, FlatList, Text, StyleSheet, Pressable} from 'react-native'
-import React, { useCallback, useState } from 'react'
-import { DAYS, EventData } from '@/constants/EventTypes'
+import React, { useCallback, useEffect, useState } from 'react'
+import { DAYS, DefaultEventData, EventData } from '@/constants/EventTypes'
 import { loadData } from '@/utils/localStorage'
 import { formatEventTitle, generateID, loadThemeMap } from '@/utils/eventTools'
 import { EventColorsType, EventColors } from '@/constants/EventColors'
@@ -8,8 +8,9 @@ import EditorButtons from '@/components/editor/Buttons'
 import { DEVELOPER_MODE } from '@/constants/Settings'
 import Item from '@/components/editor/Item'
 import { storeData } from '@/utils/localStorage'
-import { router, useRouter, useFocusEffect } from 'expo-router'
+import { useRouter, useFocusEffect } from 'expo-router'
 import { ConfirmationDialog } from '@/components/ConfirmationDialog'
+import ItemEditModal from '@/components/editor/ItemModal'
 
 interface EditorProps {
     data?: EventData[]
@@ -34,7 +35,7 @@ export default function Editor(props: EditorProps) {
     const [loading, setLoading] = useState(true)
     const [cdVisible, setCDvisible] = useState(false)
     const router = useRouter()
-    let [openTileId, setOpenTileId] = useState<number | null>(null);
+    let [openItem, setOpenItem] = useState<EventData | null>(null);
 
     useFocusEffect(
     useCallback(()=>{ // Memoising the function
@@ -92,45 +93,44 @@ export default function Editor(props: EditorProps) {
     }
 
     function editData(changes: EventData, id: number){
-        let tmp = [...data]
-        tmp = tmp.map((item) => item.id == id ? changes : item)
-        if (openTileId == id)
-            setOpenTileId(null)
+        let tmp = data.map((item) => item.id == id ? changes : item)
         setData(tmp);
     }
 
     function deleteElemenet(id: number){
-        // let tmp = [...data]
         let tmp = data.filter((item, ind) => item.id != id )
+        setOpenItem(null)
         setData(tmp)
+    }
+
+    function openEditingItem(item: EventData){
+        setOpenItem(item)
     }
 
     function createNewLesson(){
         let id = generateID(data)
         if (!id) return
 
-        let newLesson: EventData = {
-            id,
-            title: "",
-            shortTitle: '',
-            location: '',
-            teacher: '',
-            startTime: [8, 0],
-            endTime: [8, 45],
-            day: "MON",
-        }
+        let newLesson: EventData = {...DefaultEventData, id}
+
         let tmp = [...data]
         tmp.push(newLesson)
-        setOpenTileId(id)
+        setOpenItem(newLesson)
         setData(tmp)
-        
-
     }
 
-    const renderSections = ({item, index}: {item:string, index: number}) => {
+    function handleClose(final: EventData | null) {
+        console.log("Closing",final)
+        if(final)
+            editData(final, final.id); 
+        setOpenItem(null)
+    }
+
+    const RenderedSections = React.memo(
+        ({item, index, data}: {item: string, index: number, data: EventData[]}) =>{
         if(item == SECTIONS_END){
             return(
-                <View style={styles.section}>
+                <View key={item} style={styles.section}>
                     
                 <View style={[styles.title, {opacity: 1, justifyContent: 'space-evenly', gap: 10, marginTop: 50 , width: '80%'}]}>
                 
@@ -163,7 +163,7 @@ export default function Editor(props: EditorProps) {
         }
 
         return (
-            <View style={styles.section}>
+            <View key={item} style={styles.section}>
                 <Title text ={item} />
                 <View style={styles.itemContainer}>
                     {
@@ -171,19 +171,14 @@ export default function Editor(props: EditorProps) {
                                                 (index == sections.length-2 && !DAYS.includes(event.day))
                                     )
                         .map((tile, j) => {
-                            let flag = false
-                            if(openTileId){
-                                console.log(`[editScreen]: opening: ${openTileId}`)
-                                flag = tile.id == openTileId
-                            }
-                            return <Item key={tile.id} data={tile} ThemeMap={ThemeMap} editCallback={editData} deleteCallback={deleteElemenet} opened={flag}/>
+                            return <Item key={tile.id} data={tile} theme={ThemeMap.get(tile.location)} openCallback={openEditingItem} />
                         })
                     }
                 </View>
             </View>
         )
-    }
-    
+        }
+    )
     return (
         <View style={styles.container}>
 
@@ -200,11 +195,27 @@ export default function Editor(props: EditorProps) {
              :
             <></>
             }
+
+
+            <ItemEditModal 
+            key={openItem?.id ?? 'new'} 
+            data={openItem}
+            ThemeMap={ThemeMap} 
+            editCallback={editData} 
+            deleteCallback={deleteElemenet} 
+            closeCallback={handleClose}
+            />
+
             
             <FlatList style={styles.scrollContainer} contentContainerStyle={{paddingBottom: 100}}
             data={sections}
+            // keyExtractor={(_:string, ind:number)=>{ return DAYS[ind] }}
+            extraData={data}
             initialNumToRender={4}
-            renderItem={ renderSections } />
+            renderItem={ ({item, index}:{item: string, index: number}) => {return (
+                <RenderedSections item={item} index={index} data={data} />
+            )} } 
+            />
 
             <EditorButtons editButtonFunction={createNewLesson}/>
         </View>
