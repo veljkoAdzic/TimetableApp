@@ -5,6 +5,8 @@ import { View, Text, StyleSheet, Pressable, TextInput } from 'react-native'
 import DropDownPicker from 'react-native-dropdown-picker'
 import DateTimePicker from '@react-native-community/datetimepicker'
 import { EventColorsType } from "@/constants/EventColors";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { formatEventTitle } from "@/utils/eventTools";
 
 export default function Form(props: {data: EventData, theme: EventColorsType, editCallback: (edit: EventData) => void}){
     const [formData, setFormData] = useState(props.data)
@@ -113,8 +115,9 @@ export default function Form(props: {data: EventData, theme: EventColorsType, ed
             />
 
             {/* ShortName TextInput */}
+            <View style={{flexDirection: 'row'}}>
             <TextInput
-            style={[styles.input, {color: props.theme.text}]}
+            style={[styles.input, {color: props.theme.text, flexGrow: 1}]}
             onChangeText={(shortTitle) => { 
                 let tmp = {...formData, shortTitle};
                 setFormData(tmp)
@@ -124,6 +127,15 @@ export default function Form(props: {data: EventData, theme: EventColorsType, ed
             value={formData.shortTitle}
             placeholder='Display name'
             />
+            <Pressable style={styles.button} onPress={() => { 
+                let tmp = {...formData}
+                tmp.shortTitle = formatEventTitle(tmp.title)
+                setFormData(tmp)
+                props.editCallback(tmp)
+             }}>
+            <MaterialCommunityIcons name="auto-fix" color={props.theme.text} size={24} />
+            </Pressable>
+            </View>
 
             {/* Location TextInput */}
             <TextInput
@@ -210,6 +222,8 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         padding: 10,
         backgroundColor: '#FFF4', 
+        fontSize: 14,
+        lineHeight: 15
     },
     TimeSection: {
         padding: 12, 
@@ -228,5 +242,16 @@ const styles = StyleSheet.create({
         margin: 12,
         backgroundColor: '#FFF4',
         borderRadius: 0
+    },
+    button: {
+        borderColor: 'black', 
+        borderWidth: 1, 
+        justifyContent: 'center', 
+        alignItems: 'center', 
+        aspectRatio: 1/1, 
+        height: 40,
+        backgroundColor: '#FFF4',
+        margin: 12,
+        marginLeft: 0
     }
 })

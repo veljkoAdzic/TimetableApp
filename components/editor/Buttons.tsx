@@ -75,7 +75,7 @@ export default function EditorButtons(props: { editButtonFunction: () => void}){
                 <Animated.View style={[styles.button, editStyle]}>
                     <Pressable style={{padding: 10}}
                     onPress={() => { toggleOpening(); props.editButtonFunction(); }}>
-                        <MaterialCommunityIcons name="pencil" size={40} color='#eee' />
+                        <MaterialCommunityIcons name="pencil-plus" size={40} color='#eee' />
                     </Pressable>
                 </Animated.View>
                

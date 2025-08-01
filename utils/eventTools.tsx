@@ -11,11 +11,9 @@ export function formatEventTitle(title: string) {
     let res = ""
 
     if (fragments.length <= 3) {
-        fragments.forEach((f, _) => {
-            res += f.substring(0, 3) + " "
-        })
+        res = fragments.map((fr, _) => fr.substring(0, 3)).join(" ")
 
-        res.trimEnd()
+        res.trim()
 
         if (res.length <= maxLen)
             return res
@@ -26,7 +24,7 @@ export function formatEventTitle(title: string) {
         res += f.charAt(0)
     })
 
-    return res
+    return res.trim()
 }
 
 export const loadThemeMap = async (map: Map<any, any>) => {

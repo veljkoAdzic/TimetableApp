@@ -5,6 +5,7 @@ import { loadData, storeData } from '@/utils/localStorage'
 import { EventData } from '@/constants/EventTypes'
 import { DEVELOPER_MODE } from '@/constants/Settings'
 import { useLocalSearchParams } from 'expo-router'
+import { formatEventTitle } from '@/utils/eventTools'
 
 function SideBar(){
     return(
@@ -43,13 +44,15 @@ export default function TimetableScreen(){
             .then((res) => {
                 if(DEVELOPER_MODE)
                     console.log("[TimetableScreen>useEffect([reload])]: Rerender")
-                let data = (res) ? JSON.parse(res) : [];  
+                let data:EventData[] = (res) ? JSON.parse(res) : [];  
+                for (let i =0; i < data.length; i++) {
+                    if(data[i].shortTitle == undefined){
+                        data[i].shortTitle = formatEventTitle(data[i].title)
+                    }
+                }
                 setEventData(data)
                 setLoadingEvents(false);
             })
-            setTimeout(() =>{
-                setReload(false)
-            }, 80)
         }
     },[reload])
         
@@ -57,7 +60,13 @@ export default function TimetableScreen(){
         setLoadingEvents(true)
         if(events_data){
             const tmp = async () => {
-                await storeData('eventData', JSON.stringify(events_data))
+                let data = [...events_data]
+                for (let i =0; i < data.length; i++) {
+                    if(data[i].shortTitle == undefined){
+                        data[i].shortTitle = formatEventTitle(data[i].title)
+                    }
+                }
+                await storeData('eventData', JSON.stringify(data))
                 if(DEVELOPER_MODE)
                     console.log("[TimetableScreen>useEffect([])]: stored event data!")
             }
@@ -74,6 +83,13 @@ export default function TimetableScreen(){
             if(DEVELOPER_MODE)
                 console.log("[TimetableScreen>useEffect([])]: loaded event data!")
             let data = (res) ? JSON.parse(res) : [];  
+
+            for (let i =0; i < data.length; i++) {
+                if(data[i].shortTitle == undefined){
+                    data[i].shortTitle = formatEventTitle(data[i].title)
+                }
+            }
+
             setEventData(data)
             setLoadingEvents(false);
         })

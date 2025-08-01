@@ -1,6 +1,7 @@
 import { ConfirmationDialog } from "@/components/ConfirmationDialog"
 import { DEVELOPER_MODE } from "@/constants/Settings"
 import { clearStorage, listStoredData, storeData } from "@/utils/localStorage"
+import { router } from "expo-router"
 import { useState } from "react"
 import { View, Text, StyleSheet, Pressable, FlatList, ScrollView, Modal } from "react-native" 
 
@@ -242,6 +243,8 @@ function generateDummyData(){
     ]
 
     storeData('eventData', JSON.stringify(data))
+
+    router.push({pathname:'/', params: {refresh: Date.now().toString()}})
 }
 
 export default function DevScreen(){
