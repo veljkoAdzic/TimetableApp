@@ -7,7 +7,6 @@ import { EventData, DefaultEventData } from '@/constants/EventTypes'
 import { EventColorsType, DefaultEventColor, EventColors } from '@/constants/EventColors'
 
 export default function ItemEditModal(props: {data: EventData | null, ThemeMap: Map<string, EventColorsType>, editCallback: (data: EventData, id: number) => void, deleteCallback: (id: number) => void, closeCallback:(final: EventData | null) => void}) {
-    // const [modalVisible, setModalVisible] = useState(!!props.data);
     const [cdVisible, setCDvisible] = useState(false);
     const [data, setData] = useState<EventData>(DefaultEventData);
     const [theme, setTheme] = useState<EventColorsType>(DefaultEventColor)

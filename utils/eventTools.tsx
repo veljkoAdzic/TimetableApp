@@ -7,7 +7,7 @@ export function formatEventTitle(title: string) {
     const maxLen = 9
     if (title.length <= maxLen) //can fit as is
         return title
-    const fragments = title.split(/\W/)
+    const fragments = title.match(/\S+/gu) || []
     let res = ""
 
     if (fragments.length <= 3) {
