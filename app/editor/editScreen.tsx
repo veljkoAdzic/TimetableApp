@@ -120,7 +120,6 @@ export default function Editor(props: EditorProps) {
     }
 
     function handleClose(final: EventData | null) {
-        console.log("Closing",final)
         if(final)
             editData(final, final.id); 
         setOpenItem(null)
