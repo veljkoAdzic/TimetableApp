@@ -10,7 +10,6 @@ import { formatEventTitle } from "@/utils/eventTools";
 
 export default function Form(props: {data: EventData, theme: EventColorsType, editCallback: (edit: EventData) => void}){
     const [formData, setFormData] = useState(props.data)
-
     const [dropdownOpen, setDropdownOpen] = useState(false);
     const [ddItems, setDdItems] = useState([
         {label: 'Monday', value: 'MON'},
@@ -27,6 +26,43 @@ export default function Form(props: {data: EventData, theme: EventColorsType, ed
     const [EndTime, setEndTime] = useState(new Time(formData.endTime))
     const [endTimeVisible, setEndTimeVisible] = useState(false)
 
+    const [formErrors, setFormErrors] = useState('')
+
+    function validateForm(value: EventData){
+        let res:string = ''
+        if(value.title.length == 0){
+            setFormErrors('title')
+            return 'title'
+        }
+        if(!value.shortTitle || value.shortTitle.length == 0){
+            setFormErrors('shortTitle')
+            return 'shortTitle'
+        }
+        if(value.location.length == 0){
+            setFormErrors('location')
+            return 'location'
+        }
+        if(value.teacher.length == 0){
+            setFormErrors('teacher')
+            return 'teacher'
+        }
+        if(value.startTime[0] < 8 || value.startTime[0] > 21){
+            setFormErrors('startTime')
+            return 'startTime'
+        }
+        if(value.endTime[0] < 8 || value.endTime[0] > 21 || 
+           value.endTime[0] < value.startTime[0] || 
+           (value.startTime[0] == value.endTime[0] && 
+           value.endTime[1] <= value.startTime[1])
+        ){
+            setFormErrors('endTime')
+            return 'endTime'
+        }
+
+        setFormErrors('')
+        return res
+    }
+
     useEffect(() => {
         setFormData(props.data);
         setDropdownValue(props.data.day);
@@ -34,33 +70,33 @@ export default function Form(props: {data: EventData, theme: EventColorsType, ed
         setEndTime(new Time(props.data.endTime));
     }, [props.data]);
 
-    const showStartTimePicker = () => {
-        setStartTimeVisible(true);
-    }
-
     const saveTitle = () => {
         let tmp = {...formData}
         tmp.title = tmp.title.trim()
         setFormData(tmp)
-        props.editCallback(tmp)
+        if(validateForm(tmp) != 'title')
+            props.editCallback(tmp)
     }
     const saveShortText = () => {
         let tmp = {...formData}
         tmp.shortTitle = tmp.shortTitle!.trim()
         setFormData(tmp)
-        props.editCallback(tmp)
+        if(validateForm(tmp) != 'shortTitle')
+            props.editCallback(tmp)
     }
     const saveLocation = () => {
         let tmp = {...formData}
         tmp.location = tmp.location.trim()
         setFormData(tmp)
-        props.editCallback(tmp)
+        if(validateForm(tmp) != 'location')
+            props.editCallback(tmp)
     }
     const saveTeacher =  () => {
         let tmp = {...formData}
         tmp.teacher = tmp.teacher!.trim()
         setFormData(tmp)
-        props.editCallback(tmp)
+        if(validateForm(tmp) != 'teacher')
+            props.editCallback(tmp)
     }
     const saveStartTime = (ev: any, selected: Date | undefined) => {
         if (selected == undefined) return;
@@ -74,8 +110,8 @@ export default function Form(props: {data: EventData, theme: EventColorsType, ed
         let tmp = {...formData, startTime}
 
         setFormData(tmp);
-
-        props.editCallback(tmp)
+        if(validateForm(tmp) != 'startTime')
+            props.editCallback(tmp)
     }
     const saveEndTime = (ev: any, selected: Date | undefined) => {
         if (selected == undefined) return;
@@ -90,7 +126,8 @@ export default function Form(props: {data: EventData, theme: EventColorsType, ed
 
         setFormData(tmp);
 
-        props.editCallback(tmp) 
+        if(validateForm(tmp) != 'endTime')
+            props.editCallback(tmp) 
     }
     const saveDay = (day: string | null) => {
         if (day == null) return; 
@@ -103,7 +140,7 @@ export default function Form(props: {data: EventData, theme: EventColorsType, ed
         <View style={{padding: 35, paddingBottom: 18}}>
             {/* FullName TextInput */}
             <TextInput
-            style={[styles.input, {color: props.theme.text}]}
+            style={[styles.input, {color: props.theme.text}, (formErrors.includes('title'))? styles.error : {}]}
             onChangeText={(title) => { 
                 let tmp = {...formData, title};
                 setFormData(tmp)
@@ -117,7 +154,7 @@ export default function Form(props: {data: EventData, theme: EventColorsType, ed
             {/* ShortName TextInput */}
             <View style={{flexDirection: 'row'}}>
             <TextInput
-            style={[styles.input, {color: props.theme.text, flexGrow: 1}]}
+            style={[styles.input, {color: props.theme.text, flexGrow: 1}, (formErrors.includes('shortTitle'))? styles.error : {}]}
             onChangeText={(shortTitle) => { 
                 let tmp = {...formData, shortTitle};
                 setFormData(tmp)
@@ -131,7 +168,8 @@ export default function Form(props: {data: EventData, theme: EventColorsType, ed
                 let tmp = {...formData}
                 tmp.shortTitle = formatEventTitle(tmp.title)
                 setFormData(tmp)
-                props.editCallback(tmp)
+                if(validateForm(tmp) != 'shortTitle')
+                    props.editCallback(tmp)
              }}>
             <MaterialCommunityIcons name="auto-fix" color={props.theme.text} size={24} />
             </Pressable>
@@ -139,7 +177,7 @@ export default function Form(props: {data: EventData, theme: EventColorsType, ed
 
             {/* Location TextInput */}
             <TextInput
-            style={[styles.input, {color: props.theme.text}]}
+            style={[styles.input, {color: props.theme.text}, (formErrors.includes('location'))? styles.error : {}]}
             onChangeText={(location) => { 
                 let tmp = {...formData, location}
                 setFormData(tmp)
@@ -152,7 +190,7 @@ export default function Form(props: {data: EventData, theme: EventColorsType, ed
 
             {/* Teachers TextInput */}
             <TextInput
-            style={[styles.input, {color: props.theme.text}]}
+            style={[styles.input, {color: props.theme.text}, (formErrors.includes('teacher'))? styles.error : {}]}
             onChangeText={(teacher) => { 
                 let tmp = {...formData, teacher};
                 setFormData(tmp)
@@ -168,7 +206,7 @@ export default function Form(props: {data: EventData, theme: EventColorsType, ed
                 <Text style={[{fontSize: 20, paddingHorizontal: 5, color: props.theme.text}]}>Start Time</Text>
 
                 <Pressable onPress={() => {setStartTimeVisible(true)}}>
-                <Text style={[styles.TimeButton, {color: props.theme.text}]}>{StartTime.toString()}</Text>
+                <Text style={[styles.TimeButton, {color: props.theme.text}, (formErrors.includes('startTime'))? styles.error : {}]}>{StartTime.toString()}</Text>
                 </Pressable>
                 
                 {startTimeVisible &&
@@ -185,7 +223,7 @@ export default function Form(props: {data: EventData, theme: EventColorsType, ed
                 <Text style={[{fontSize: 20, paddingHorizontal: 5, color: props.theme.text}]}>End Time</Text>
 
                 <Pressable onPress={() => {setEndTimeVisible(true)}}>
-                <Text style={[styles.TimeButton, {color: props.theme.text}]}>{EndTime.toString()}</Text>
+                <Text style={[styles.TimeButton, {color: props.theme.text}, (formErrors.includes('endTime'))? styles.error : {}]}>{EndTime.toString()}</Text>
                 </Pressable>
                 
                 {endTimeVisible &&
@@ -253,5 +291,9 @@ const styles = StyleSheet.create({
         backgroundColor: '#FFF4',
         margin: 12,
         marginLeft: 0
+    },
+    error: {
+        borderColor: '#F55',
+        backgroundColor: '#F554'
     }
 })
