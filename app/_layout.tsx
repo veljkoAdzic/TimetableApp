@@ -8,7 +8,7 @@ export default function RootLayout() {
       <Drawer>
         <Drawer.Screen name="index" options={{drawerLabel: 'Timetable', title: 'Weekly Timetable'}}/>
         <Drawer.Screen name='about' options={{drawerLabel: 'About', title: 'About Page'}} />
-        <Drawer.Screen name='editor' options={{drawerLabel: 'Edit Screen', title: 'Editor Screen (final)'}} />
+        <Drawer.Screen name='editor' options={{drawerLabel: 'Edit Lessons', title: 'Editor for lessons'}} />
 
         <Drawer.Screen name='devTools' options={{
           drawerLabel: 'Dev Tools', 

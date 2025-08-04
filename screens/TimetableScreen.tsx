@@ -52,6 +52,7 @@ export default function TimetableScreen(){
                 }
                 setEventData(data)
                 setLoadingEvents(false);
+                setReload(false)
             })
         }
     },[reload])

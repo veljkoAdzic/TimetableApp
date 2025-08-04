@@ -137,13 +137,12 @@ export default function Editor(props: EditorProps) {
                     <Pressable
                     onPress={ () => {
                         // SAVE
-                        storeData('eventData', JSON.stringify(data))
                         storeData('ThemeMap', JSON.stringify([...ThemeMap]))
-                        
-                        router.push({pathname:'/', params: {refresh: Date.now().toString()}})
+                        .then(() => storeData('eventData', JSON.stringify(data)) )
+                        .then(() => router.push({pathname:'/', params: {refresh: Date.now().toString()}}) )
                     } }
                     >
-                        <Text style={[styles.button, {backgroundColor: 'lime'}]}>Save</Text>
+                        <Text style={[styles.button, {backgroundColor: 'green'}]}>Save</Text>
                     </Pressable>
 
                     <Pressable
@@ -208,7 +207,6 @@ export default function Editor(props: EditorProps) {
             
             <FlatList style={styles.scrollContainer} contentContainerStyle={{paddingBottom: 100}}
             data={sections}
-            // keyExtractor={(_:string, ind:number)=>{ return DAYS[ind] }}
             extraData={data}
             initialNumToRender={4}
             renderItem={ ({item, index}:{item: string, index: number}) => {return (
