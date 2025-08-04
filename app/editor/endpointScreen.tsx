@@ -35,11 +35,8 @@ export default function EndpointScreen() {
                 getClassList(inputValue)
                 .then((classes) => {
                     classes.sort((a, b) => a.label.localeCompare(b.label))
-                    for (let c of classes){
-                        console.log(c.value, c.label)
-                    }
                     setLoader(loaderStates.finished)
-                    router.navigate('/editor/downloader2')
+                    router.push({pathname:'/editor/downloaderScreen', params: {classesList: JSON.stringify(classes), URL: inputValue}})
                 })
             } }
             >

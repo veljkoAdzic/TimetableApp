@@ -22,7 +22,8 @@ const edngeCases = (i: number, j: number) => {
 }
 
 interface GridProps extends React.ComponentProps<typeof View> {
-    events: EventData[]
+    events: EventData[],
+    previewMode?: boolean 
 }
 
 const ThemeMap = new Map<string, EventColorsType>();
@@ -44,9 +45,10 @@ export default function Grid(props: GridProps){
     const loadData = () => {
         let modified = false;
         setLoaded(false);
-        loadThemeMap(ThemeMap).then(() => {
+        loadThemeMap(ThemeMap)
+        .then(() => {
             for(let e of props.events){
-                if(!ThemeMap.has(e.location)){
+                if(e.location.length != 0 && !ThemeMap.has(e.location)){
                     modified = true;
                     if(DEVELOPER_MODE)
                         console.log('[Grid>useEffect([])]: Miss ' + e.location) // debugging
@@ -56,7 +58,7 @@ export default function Grid(props: GridProps){
                     console.log('[Grid>useEffect([])]: Hit ' + e.location)
             }
             setLoaded(true);
-            if(modified)
+            if(modified && !(props.previewMode || false))
             storeData('ThemeMap', JSON.stringify([...ThemeMap]))
             .then(() => {
                 if(DEVELOPER_MODE)
@@ -73,7 +75,7 @@ export default function Grid(props: GridProps){
                 }
             }
 
-            if (modified){
+            if (modified && !(props.previewMode || false)){
                 // store the changes
                 storeData('eventData', JSON.stringify(props.events))
             }
@@ -90,6 +92,10 @@ export default function Grid(props: GridProps){
             setReload(false)
         }
     },[reload])
+
+    useEffect(()=>{
+            setReload(true)
+    }, [props.events])
     
     if(!themeLoaded){
         return (

@@ -1,7 +1,6 @@
 import { View, Text, StyleSheet } from 'react-native'
 import React from 'react'
-import { EventColors, EventColorsType } from '@/constants/EventColors'
-import { loadData, storeData } from '../utils/localStorage'
+import { DefaultEventColor, EventColorsType } from '@/constants/EventColors'
 import { formatEventTitle, loadThemeMap } from '@/utils/eventTools'
 import { useState, useEffect } from 'react'
 import { EventData } from '../constants/EventTypes'
@@ -56,7 +55,7 @@ const findDimensions = (data: EventData) => {
 
 
 export default function EventBlock(props: EventBlockProps){
-    const [theme, setTheme] = useState<EventColorsType>(EventColors[0])
+    const [theme, setTheme] = useState<EventColorsType>(DefaultEventColor)
 
 
     

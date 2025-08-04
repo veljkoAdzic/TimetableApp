@@ -22,9 +22,9 @@ function SideBar(){
 
 
 
-export default function TimetableScreen(){
+export default function TimetableScreen(props: {data?: EventData[]}){
     const [loadingEvents, setLoadingEvents] = useState(true)
-    const [events_data, setEventData] = useState<EventData[] | null>(null)
+    const [events_data, setEventData] = useState<EventData[] | null>(props.data || null)
 
     const {refresh} = useLocalSearchParams()
     const [reload, setReload] = useState(false)
@@ -38,7 +38,7 @@ export default function TimetableScreen(){
     },[refresh])
 
     useEffect(()=>{
-        if(reload){
+        if(reload && props.data == null){
             setLoadingEvents(true)
             loadData('eventData')
             .then((res) => {
@@ -55,21 +55,25 @@ export default function TimetableScreen(){
                 setReload(false)
             })
         }
+        if(reload){
+            setReload(false)
+            setLoadingEvents(false)
+        }
     },[reload])
         
     useEffect(() =>{
         setLoadingEvents(true)
         if(events_data){
-            const tmp = async () => {
+            const tmp = () => {
                 let data = [...events_data]
                 for (let i =0; i < data.length; i++) {
                     if(data[i].shortTitle == undefined){
                         data[i].shortTitle = formatEventTitle(data[i].title)
                     }
                 }
-                await storeData('eventData', JSON.stringify(data))
-                if(DEVELOPER_MODE)
-                    console.log("[TimetableScreen>useEffect([])]: stored event data!")
+                // await storeData('eventData', JSON.stringify(data))
+                // if(DEVELOPER_MODE)
+                //     console.log("[TimetableScreen>useEffect([])]: stored event data!")
             }
 
             if(events_data.length > 0)
@@ -96,6 +100,13 @@ export default function TimetableScreen(){
         })
     }, [])
 
+    useEffect(()=>{
+        if(props.data && props.data.length > 0){
+            setEventData(props.data)
+            setReload(true)
+        }
+    },[props.data])
+
     if(loadingEvents){
         return(
             <View>
@@ -108,7 +119,7 @@ export default function TimetableScreen(){
         <View style={styles.ttContainer}>
             <SideBar />
             <View style={styles.gridContainer}>
-                <Grid events={events_data!}/>
+                <Grid events={events_data!} previewMode={(props.data != undefined)}/>
             </View>
         </View>
     )

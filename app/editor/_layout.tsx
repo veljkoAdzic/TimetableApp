@@ -10,7 +10,7 @@ export default function EditScreen(){
         >
             <Stack.Screen name="editScreen" />
             <Stack.Screen name="endpointScreen" />
-            <Stack.Screen name="downloader2" />
+            <Stack.Screen name="downloaderScreen" />
         </Stack>
     )
 }
