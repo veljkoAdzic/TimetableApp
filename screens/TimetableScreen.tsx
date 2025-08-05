@@ -12,7 +12,7 @@ function SideBar(){
         <View>
             { Array.from({length: 13}).map( (_, index) => (
                 <View key={index} style={styles.timeSlots}>
-                    <Text style={styles.timedisplay}> { ` ${(index < 2)?'0':''}${index+8}` }:00</Text>
+                    <Text style={[styles.timedisplay, index == 0 ? {borderTopWidth: 1, borderTopColor: '#8883'} : {}]}> { ` ${(index < 2)?'0':''}${index+8}` }:00</Text>
                 </View>
             )
             )}
@@ -139,7 +139,8 @@ const styles = StyleSheet.create({
         height: `${100/13}%`,
         alignItems: 'center',
         borderBottomWidth: 1,
-        borderBottomColor: '#8883'
+        borderColor: '#8883',
+        boxSizing: 'border-box'
     },
     timedisplay: {
         fontSize: 10,

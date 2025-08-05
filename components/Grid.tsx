@@ -47,6 +47,8 @@ export default function Grid(props: GridProps){
         setLoaded(false);
         loadThemeMap(ThemeMap)
         .then(() => {
+            if(props.previewMode || false) ThemeMap.clear()
+                
             for(let e of props.events){
                 if(e.location.length != 0 && !ThemeMap.has(e.location)){
                     modified = true;
