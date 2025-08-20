@@ -6,6 +6,9 @@ import TimetableScreen from '@/screens/TimetableScreen'
 import { EventData } from '@/constants/EventTypes'
 import { getLessonsByID } from '@/utils/timetableData'
 import { MaterialCommunityIcons } from '@expo/vector-icons'
+import { EventColorsType, EventColors } from '@/constants/EventColors'
+import { clearStorage, storeData } from '@/utils/localStorage'
+
 export default function DownloaderPage1() {
     const router = useRouter()
     const { classesList, URL }:{classesList: string, URL: string} = useLocalSearchParams()
@@ -17,6 +20,7 @@ export default function DownloaderPage1() {
     const [lessons, setLessons] = useState<EventData[]>([])
 
     const [selectAll, setSelectAll] = useState(false)
+    const [selections, setSelections] = useState<number[]>([])
 
     function onChange(val: string|null) {
         if(val != null)
@@ -26,11 +30,74 @@ export default function DownloaderPage1() {
             })
         else
             setLessons([])
+
+        setSelections([])
+    }
+
+    async function handleSave() {
+
+        if(selections.length == 0) return
+
+        // create theme map
+        let tmp_theme = new Map<string, EventColorsType>(); 
+        for (let lesson of lessons){
+            if(!tmp_theme.has(lesson.location) && lesson.location.length > 0){
+                const index = tmp_theme.size % EventColors.length
+                tmp_theme.set(lesson.location, EventColors[index])
+            }
+        }
+
+        // Prune theme map to store only the ones that are needed
+        const final_theme = new Map<string, EventColorsType>()
+        for (let id of selections) {
+            let less = lessons.find((el)=> {return el.id == id} )
+            let loc = less!.location
+            
+            if (!final_theme.has(loc)){
+                final_theme.set(loc, tmp_theme.get(loc)!) 
+            }
+            
+        }
+
+        // get only selected lessons
+        const final_lessons = lessons.filter((el) => { return selections.includes(el.id) })
+
+        // store to async storage and redirect to root
+        await clearStorage()
+        .then(() => 
+        storeData('ThemeMap', JSON.stringify([...final_theme]))
+        .then(() => 
+        storeData('eventData', JSON.stringify(final_lessons)) )
+        .then(() => {
+            router.dismissAll()
+            router.push({pathname:'/', params: {refresh: Date.now().toString()}})
+        } ))
+        
+    }
+
+    function handleSelectAll() {  
+        if(!selectAll){ // Selecting all
+            setSelections(lessons.map((el) => el.id))
+        } else { // Deselect all
+            setSelections([])
+        }
     }
 
     useEffect(()=>{
         onChange(dropdownValue)
     },[])
+
+    useEffect(()=>{
+        if (selections.length >= lessons.length){
+            setSelectAll(true)
+        } else {
+            setSelectAll(false)
+        }
+    },[selections])
+
+    useEffect(() => {
+        onChange(dropdownValue)
+    }, [classesList])
 
     return ( 
         <View style={styles.screenContainer}>
@@ -52,14 +119,15 @@ export default function DownloaderPage1() {
 
             <Pressable
             style={styles.selectAllPressable}
-            onPress={() => {setSelectAll(!selectAll)}}>
+            onPress={handleSelectAll}>
                 <MaterialCommunityIcons size={25} name={selectAll ? 'radiobox-marked' : 'radiobox-blank'} color={'black'} />
                 <Text style={{fontSize: 17}}>All</Text>
             </Pressable>
         </View>
 
+            
             <View style={styles.timetableContainer} >
-                <TimetableScreen data={lessons}/>
+                <TimetableScreen data={lessons} selected={selections} setSelected={setSelections}/>
             </View>    
             
             <View style={styles.buttonsContainer}>
@@ -67,7 +135,7 @@ export default function DownloaderPage1() {
                 <Text style={[styles.button, {backgroundColor: '#80B1FF', color: '#222'}]}>Back</Text>
             </Pressable>
 
-            <Pressable onPress={() => { /*TODO*/ }}>
+            <Pressable onPress={handleSave}>
                 <Text style={[styles.button, {backgroundColor: 'green'}]}>Save</Text>
             </Pressable>
             </View>

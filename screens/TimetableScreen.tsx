@@ -22,7 +22,7 @@ function SideBar(){
 
 
 
-export default function TimetableScreen(props: {data?: EventData[]}){
+export default function TimetableScreen(props: {data?: EventData[], selected?: number[], setSelected?: (ids: number[]) => void}){
     const [loadingEvents, setLoadingEvents] = useState(true)
     const [events_data, setEventData] = useState<EventData[] | null>(props.data || null)
 
@@ -119,7 +119,7 @@ export default function TimetableScreen(props: {data?: EventData[]}){
         <View style={styles.ttContainer}>
             <SideBar />
             <View style={styles.gridContainer}>
-                <Grid events={events_data!} previewMode={(props.data != undefined)}/>
+                <Grid events={events_data!} previewMode={(props.data != undefined)} selected={props.selected} setSelected={props.setSelected}/>
             </View>
         </View>
     )

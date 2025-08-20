@@ -7,6 +7,7 @@ import { useEffect, useState, useRef } from 'react'
 import { storeData } from '@/utils/localStorage'
 import { DEVELOPER_MODE } from '@/constants/Settings'
 import { useLocalSearchParams } from 'expo-router'
+
 const edngeCases = (i: number, j: number) => {
     let res = {
         borderTopWidth: 0,
@@ -23,13 +24,17 @@ const edngeCases = (i: number, j: number) => {
 
 interface GridProps extends React.ComponentProps<typeof View> {
     events: EventData[],
-    previewMode?: boolean 
+    previewMode?: boolean,
+    selected?: number[],
+    setSelected?: (ids: number[]) => void
 }
 
 const ThemeMap = new Map<string, EventColorsType>();
 
 export default function Grid(props: GridProps){
     const [themeLoaded, setLoaded] = useState(false)
+    const selected = props.selected ?? [];
+    const setSelected = props.setSelected ?? (() => {});
 
     const {refresh} = useLocalSearchParams()
     const [reload, setReload] = useState(false)
@@ -99,6 +104,16 @@ export default function Grid(props: GridProps){
             setReload(true)
     }, [props.events])
     
+    const toggleSelection = (id: number) => {
+        let tmp = [... selected]
+        if (tmp.indexOf(id) == -1)
+            tmp.push(id)
+        else
+            tmp = tmp.filter((val, _) => val != id)           
+
+        setSelected(tmp)
+    }
+
     if(!themeLoaded){
         return (
             <View>
@@ -127,7 +142,14 @@ export default function Grid(props: GridProps){
             {
             // Loading events
             props.events.map( (item, index) => (
-                <EventBlock key={item.id} data={item} theme={ThemeMap.get(item.location)} />
+                <EventBlock 
+                key={item.id} 
+                data={item} 
+                theme={ThemeMap.get(item.location)} 
+                selectable={props.previewMode} 
+                selected={selected.includes(item.id)} 
+                selctCallback={toggleSelection}  
+                />
             ) )
             }
         </View>

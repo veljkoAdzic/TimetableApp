@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet } from 'react-native'
+import { View, Text, Pressable, StyleSheet, StyleSheetProperties } from 'react-native'
 import React from 'react'
 import { DefaultEventColor, EventColorsType } from '@/constants/EventColors'
 import { formatEventTitle, loadThemeMap } from '@/utils/eventTools'
@@ -7,7 +7,10 @@ import { EventData } from '../constants/EventTypes'
 
 interface EventBlockProps extends React.ComponentProps<typeof View> {
     data: EventData,
-    theme?: EventColorsType
+    theme?: EventColorsType,
+    selectable?: boolean,
+    selctCallback?: (id: number) => void,
+    selected?: boolean
 }
 
 const days = [ 'MON', 'TUE', 'WED', 'THU', "FRI", 'SAT', 'SUN']
@@ -57,8 +60,13 @@ const findDimensions = (data: EventData) => {
 export default function EventBlock(props: EventBlockProps){
     const [theme, setTheme] = useState<EventColorsType>(DefaultEventColor)
 
-
-    
+    const toggleSelection = () => {
+      if(props.selectable && props.selctCallback){
+        // setSelected(!selected)
+        // console.log("ress!")
+        props.selctCallback(props.data.id);
+      }
+    }
 
     useEffect(() => {
         if(props.theme){
@@ -75,30 +83,43 @@ export default function EventBlock(props: EventBlockProps){
         
       }, []);
 
+      let pressableStyle = props.selectable ? 
+      {
+        display: 'flex',
+        padding: props.selected ? 0.3 : 0.8,
+        borderWidth: 2,
+        borderColor: props.selected ? '#3733ffef' : "#e7f1f8b0" //'#e8f6ffc5'
+        
+      } : 
+      {
+        
+      }
+
     return (
-        <>
-        <View style={ StyleSheet.flatten([ 
-            styles.event, 
-            findDimensions(props.data), 
+        <Pressable onPress={toggleSelection} style={[styles.event, findDimensions(props.data), pressableStyle]}>
+        <View style={ StyleSheet.flatten([
+            {borderRadius: 4, flex: 1, overflow: 'hidden'},
             {backgroundColor: theme.background, borderColor: theme.border}
             ]) }>
                 <Text style={{color: theme.text}}>{props.data.shortTitle}</Text>
                 <Text style={{fontSize: 10, color: theme.text, opacity: 0.5}}>{props.data.location}</Text>
             </View>
-        </>
+        </Pressable>
     )
 }
 
 const styles = StyleSheet.create({
     event: {
-        backgroundColor: 'coral',   //default
+        // backgroundColor: 'coral',   //default
         textAlignVertical: 'center',
+
+        overflow: 'hidden',
 
         width: '20%',
         position: 'absolute',
 
         borderRadius: 5,
-        borderWidth: 1.5,
-        borderColor: '#FFFFFF01' //default
+        padding: 1.5,
+        // borderColor: '#FFFFFF01' //default
     }
 })
