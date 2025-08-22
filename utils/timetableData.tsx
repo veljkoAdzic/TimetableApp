@@ -4,9 +4,13 @@ import { API_MAP, DEVELOPER_MODE } from "@/constants/Settings";
 import { formatEventTitle, generateID } from "./eventTools";
 
 async function getData(url: string) {
+    const controler = new AbortController();
+    const timer = setTimeout(() => {controler.abort()}, 10000)
+
     try{
-        let res = await fetch(url)
+        let res = await fetch(url, {signal: controler.signal})
         let data = await res.json()
+        clearTimeout(timer)
         return data
     } catch (err) {
         console.log("[getData]:", err)
@@ -15,10 +19,10 @@ async function getData(url: string) {
 }
 
 export async function getClassList(rootURL: string){    
-    
     const fullURL = rootURL + API_MAP.classList.path
+
     let res = await getData(fullURL)
-    .then((rawJson: {label: string, value: string }) => { 
+    .then((rawJson: {label: string, value: string } | null) => { 
         if(rawJson == null){
             if(DEVELOPER_MODE)
                 console.log(`[getClassList]: Unable to get data from ${fullURL}`)
@@ -32,6 +36,7 @@ export async function getClassList(rootURL: string){
 
         return res
     })
+    
     return res
 }
 
@@ -76,6 +81,10 @@ export async function getLessonsByID(rootURL: string, id: string){
         }
 
         return parsed
+    })
+    .catch((err) => {
+        console.log("[getLessonsByID]:",err)
+        return []
     })
     return res
 }

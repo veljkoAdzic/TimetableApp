@@ -1,47 +1,91 @@
-import { View, Text, TextInput, Pressable, StyleSheet } from 'react-native'
-import { useState } from 'react'
+import { View, Text, TextInput, Pressable, ActivityIndicator, StyleSheet } from 'react-native'
+import { useEffect, useState } from 'react'
 import { getClassList  } from '../../utils/timetableData'
 import { useRouter } from 'expo-router'
 
 enum loaderStates {
     inactive,
     active,
-    finished
+    finished,
+    failed
 }
 
 export default function EndpointScreen() {
-    const [inputValue, setInputValue] = useState('http://192.168.100.18:369/api')  
+    const [inputValue, setInputValue] = useState('http://192.168.100.18:369/api')  // TMP !!!!
     const [loader, setLoader] = useState(loaderStates.inactive)
     const router = useRouter()
+    const [loaderTimer, setLoaderTimer] = useState<number | undefined>()
+
+    const handleButtonPress = async () =>{
+        // disable button
+        if (loader == loaderStates.active)
+            return
+
+        if(loaderTimer){
+            clearTimeout(loaderTimer)
+            setLoaderTimer(undefined)
+        }
+        setLoader(loaderStates.active)
+
+        getClassList(inputValue)
+        .then((classes) => {
+            if(classes.length == 0) 
+                throw "Error"; 
+
+            classes.sort((a, b) => a.label.localeCompare(b.label))
+            setLoader(loaderStates.finished)
+            router.push({pathname:'/editor/downloaderScreen', params: {classesList: JSON.stringify(classes), URL: inputValue}})
+        })
+        .catch((err) => {
+            setLoader(loaderStates.failed)
+            
+        })
+        .finally(() => {
+            setLoaderTimer( 
+                setTimeout(() => {
+                    setLoader(loaderStates.inactive)
+                }, 15000) 
+            )
+        })
+    }
+
     return (
         <View style={styles.container} >
+
+            <Text style={styles.title}>Input API or share link</Text>
+
             <TextInput 
-            placeholder='API endpoint' 
+            placeholder='link to timetable' 
             inputMode='url' 
             style={styles.input}
             onChangeText={ (nextTxt) => setInputValue(nextTxt.trim()) }
             value={inputValue}
              />
             
-            <Text>{ 
+            <View style={{display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 15}}>
+                {
+                    loader == loaderStates.active &&
+                    <ActivityIndicator color="#7d56d8ff" />
+                }
+
+                <Text>{ 
                 (loader == loaderStates.inactive) ? "" : 
                 (loader == loaderStates.active) ? "Loading..." : 
-                "Finished :D" 
-            }</Text>
+                (loader == loaderStates.finished) ? "Finished!" :
+                "Failed :(" 
+                }</Text>
+            </View>
             
-            <Pressable 
-            onPress={ async () =>{
-                setLoader(loaderStates.active)
-                getClassList(inputValue)
-                .then((classes) => {
-                    classes.sort((a, b) => a.label.localeCompare(b.label))
-                    setLoader(loaderStates.finished)
-                    router.push({pathname:'/editor/downloaderScreen', params: {classesList: JSON.stringify(classes), URL: inputValue}})
-                })
-            } }
-            >
+            <Pressable onPress={ handleButtonPress } >
                 { ({pressed}) =>
-                <Text style={[styles.button, (pressed) ? styles.buttonActive : styles.buttonPassive]}>Check DB</Text>
+                <Text 
+                style={[styles.button, 
+                (pressed || loader == loaderStates.active) ? 
+                styles.buttonActive : 
+                styles.buttonPassive]}
+                >
+                    Get Timetable
+                </Text>
                 }
             </Pressable>
         </View>
@@ -53,7 +97,7 @@ const styles = StyleSheet.create({
         flex: 1,
         alignItems: 'center',
         gap: 50,
-        paddingTop: "25%"
+        paddingTop: "15%"
     },
     input: {
         borderColor: 'rgba(0,0,0,0.5)',
@@ -61,6 +105,13 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         padding: 10,
         width: '75%'
+    },
+
+    title: {
+        textAlign: 'center', 
+        fontSize: 25, 
+        paddingVertical: 10,
+        paddingBottom: 40
     },
 
     button: {

@@ -132,11 +132,15 @@ export default function DownloaderPage1() {
             
             <View style={styles.buttonsContainer}>
             <Pressable onPress={() => { router.back() }}>
-                <Text style={[styles.button, {backgroundColor: '#80B1FF', color: '#222'}]}>Back</Text>
+            { ({pressed}) =>
+                <Text style={[styles.button, {backgroundColor: (pressed ? '#A0D1FF':'#80B1FF'), color: '#222'}]}>Back</Text>                
+            }
             </Pressable>
 
             <Pressable onPress={handleSave}>
-                <Text style={[styles.button, {backgroundColor: 'green'}]}>Save</Text>
+            { ({pressed}) =>
+                <Text style={[styles.button, {backgroundColor: (pressed ? '#00A000ff' : '#008000')}]}>Save</Text>
+            }
             </Pressable>
             </View>
            
@@ -198,6 +202,6 @@ const styles = StyleSheet.create({
         fontSize: 20,
         paddingVertical: 9,
         paddingHorizontal: 18,
-        borderRadius: 3
+        borderRadius: 7
     }
 })
