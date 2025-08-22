@@ -86,7 +86,7 @@ export default function EventBlock(props: EventBlockProps){
       let pressableStyle = props.selectable ? 
       {
         display: 'flex',
-        padding: props.selected ? 0.3 : 0.8,
+        padding: 0.4,
         borderWidth: 2,
         borderColor: props.selected ? '#3733ffef' : "#e7f1f8b0" //'#e8f6ffc5'
         

@@ -120,14 +120,14 @@ export default function DownloaderPage1() {
             <Pressable
             style={styles.selectAllPressable}
             onPress={handleSelectAll}>
-                <MaterialCommunityIcons size={25} name={selectAll ? 'radiobox-marked' : 'radiobox-blank'} color={'black'} />
+                <MaterialCommunityIcons size={25} name={selections.length >= lessons.length ? 'radiobox-marked' : 'radiobox-blank'} color={'black'} />
                 <Text style={{fontSize: 17}}>All</Text>
             </Pressable>
         </View>
 
             
             <View style={styles.timetableContainer} >
-                <TimetableScreen data={lessons} selected={selections} setSelected={setSelections}/>
+                <TimetableScreen key={lessons.map(l => l.id).join(',')} data={lessons} selected={selections} setSelected={setSelections}/>
             </View>    
             
             <View style={styles.buttonsContainer}>
