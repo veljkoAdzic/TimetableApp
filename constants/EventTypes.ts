@@ -7,6 +7,7 @@ export interface EventData {
     location: string,
     extra_descriptions?: string[],
     teacher: string,
+    group: string,
 
     shortTitle?: string,
     id: number
@@ -24,4 +25,5 @@ export const DefaultEventData: EventData =
             startTime: [8, 0],
             endTime: [8, 45],
             day: "MON",
+            group: ''
         }

@@ -15,6 +15,7 @@ export default function Item(props: {data: EventData, theme: EventColorsType | u
             <View style={[styles.item, {backgroundColor: theme.background, borderColor: theme.border}]}>
                 <Text style={{color:theme.text}}>{data.shortTitle}</Text>
                 <Text style={{color: theme.text, opacity: 0.6, fontSize: 10}}>{data.location}</Text>
+                <Text style={{color: theme.text, opacity: 0.6, fontSize: 9}}>{data.group}</Text>
             </View>
         </Pressable>
         </>
@@ -26,6 +27,7 @@ const styles = StyleSheet.create({
         backgroundColor: 'orange',
         height: 110,
         aspectRatio: 6/8,
-        borderRadius: 5
+        borderRadius: 5,
+        padding: 1,
     },
 })

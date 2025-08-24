@@ -85,160 +85,175 @@ function generateDummyData(){
     {
         id: 1,
         title: "Matematika 3",
+        shortTitle: "Mat 3", 
         day: 'MON',
         startTime: [8, 0],
         endTime: [10, 45],
         location: "AMF PED",
         teacher: 'Prof a',
-        extra_descriptions: ["Prof a"]
+        group: ''
     },
 
     {
         id: 2,
         title: "Kompjuterski Mrezi i Bezbednost",
+        shortTitle: "KMB", 
         day: 'MON',
         startTime: [11, 0],
         endTime: [12, 45],
         location: "AMF PED",
         teacher: 'Prof b',
-        extra_descriptions: ["Prof b"]
+        group: ''
     },
     {
         id: 3,
-        title: "Digitizacija A",
+        title: "Digitizacija lab",
+        shortTitle: "Dig lab", 
         day: 'MON',
         startTime: [14, 0],
         endTime: [15, 30],
         location: "2",
         teacher: 'Prof c',
-        extra_descriptions: ["labs"]
+        group: 'A'
     },
 
     {
         id: 4,
-        title: "Algoritmi i Podatocni Strukturi",
+        title: "Algoritmi i Podatocni Strukturi labs",
+        shortTitle: "APS lab", 
         day: 'MON',
         startTime: [15, 30],
         endTime: [17, 0],
         location: "215",
         teacher: 'Prof d',
-        extra_descriptions: ["labs"]
+        group: 'A'
     },
-
+    
     {
         id: 5,
-        title: "Matematika 3 A",
+        title: "Matematika 3 labs",
+        shortTitle: "Mat 3 lab", 
         day: 'MON',
         startTime: [18, 30],
         endTime: [20, 0],
         location: "2",
         teacher: 'Prof a / Prof e',
-        extra_descriptions: ["labs"]
+        group: 'A'
     },
 
     {
         id: 6,
-        title: "Kompjuterski Mrezi i Bezbednost",
+        title: "Kompjuterski Mrezi i Bezbednost Labs",
+        shortTitle: "KMB lab", 
         day: 'TUE',
         startTime: [15, 30],
         endTime: [17, 0],
         location: "215",
         teacher: 'Prof e / Prof h / Prof a',
-        extra_descriptions: ["labs"]
+        group: 'B'
     },
 
     {
         id: 7,
         title: "Matematika 3",
+        shortTitle: "Mat 3", 
         day: 'TUE',
         startTime: [17, 0],
         endTime: [19, 45],
         location: "AMF PED",
         teacher: 'Prof a',
-        extra_descriptions: ["Asis a"]
+        group: ''
     },
 
     {
         id: 8,
         title: "Internet Programiranje na Klientska Strana",
+        shortTitle: "IPKS", 
         day: 'THU',
         startTime: [10, 0],
         endTime: [11, 45],
         location: "223",
         teacher: 'Prof a',
-        extra_descriptions: ["Prof c"]
+        group: ''
     },
 
     {
         id: 9,
         title: "Internet Programiranje na Klientska Strana",
+        shortTitle: "IPKS", 
         day: 'THU',
         startTime: [12, 0],
         endTime: [12, 45],
         location: "223",
         teacher: 'Prof a',
-        extra_descriptions: ["Asis b"]
+        group: ''
     },
 
     {
         id: 10,
         title: "Digitizacija",
+        shortTitle: "Dig", 
         day: 'FRI',
         startTime: [12, 0],
         endTime: [13, 45],
         location: "FINKI AMF G",
         teacher: 'Prof a',
-        extra_descriptions: ["Asis b"]
+        group: ''
     },
     {
         id: 11,
         title: "Digitizacija",
+        shortTitle: "Dig", 
         day: 'FRI',
         startTime: [14, 0],
         endTime: [15, 45],
         location: "FINKI AMF G",
         teacher: 'Prof a',
-        extra_descriptions: ["Prof c"]
+        group: ''
     },
     {
         id: 12,
-        title: "Internet Programiranje na Klientska Strana",
+        title: "Internet Programiranje na Klientska Strana Labs",
+        shortTitle: "IPKS lab", 
         day: 'THU',
         startTime: [12, 30],
         endTime: [14, 0],
         location: "138",
         teacher: 'Prof a',
-        extra_descriptions: ["labs"]
+        group: 'A'
     },
     {
         id: 13,
         title: "Kompjuterski Mrezi i Bezbednost",
+        shortTitle: "KMB", 
         day: 'THU',
         startTime: [14, 0],
         endTime: [15, 45],
         location: "AMF PED",
         teacher: 'Prof a',
-        extra_descriptions: ["asis d"]
+        group: ''
     },
     {
         id: 14,
         title: "Algoritmi i Podatocni Strukturi",
+        shortTitle: "APS", 
         day: 'THU',
         startTime: [16, 0],
         endTime: [17, 45],
         location: "AMF PED",
         teacher: 'Prof a',
-        extra_descriptions: ["prof d"]
+        group: ''
     },
     {
         id: 15,
         title: "Algoritmi i Podatocni Strukturi",
+        shortTitle: "APS", 
         day: 'THU',
         startTime: [18, 0],
         endTime: [19, 45],
         location: "AMF PED",
         teacher: 'Prof a',
-        extra_descriptions: ["asis d"]
+        group: 'A-M'
     },
     ]
 

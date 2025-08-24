@@ -98,6 +98,14 @@ export default function Form(props: {data: EventData, theme: EventColorsType, ed
         if(validateForm(tmp) != 'teacher')
             props.editCallback(tmp)
     }
+
+    const saveGroup =  () => {
+        let tmp = {...formData}
+        tmp.group = tmp.group.trim()
+        setFormData(tmp)
+        props.editCallback(tmp)
+    }
+
     const saveStartTime = (ev: any, selected: Date | undefined) => {
         if (selected == undefined) return;
 
@@ -199,6 +207,19 @@ export default function Form(props: {data: EventData, theme: EventColorsType, ed
             onEndEditing={ saveTeacher }
             value={formData.teacher}
             placeholder='Teacher'
+            />
+
+            {/* Group TextInput */}
+            <TextInput
+            style={[styles.input, {color: props.theme.text}]}
+            onChangeText={(group) => { 
+                let tmp = {...formData, group};
+                setFormData(tmp)
+            }
+            }
+            onEndEditing={ saveGroup }
+            value={formData.group}
+            placeholder='Group'
             />
 
             {/* StartTime Input */}

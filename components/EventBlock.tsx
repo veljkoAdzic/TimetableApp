@@ -98,11 +98,15 @@ export default function EventBlock(props: EventBlockProps){
     return (
         <Pressable onPress={toggleSelection} style={[styles.event, findDimensions(props.data), pressableStyle]}>
         <View style={ StyleSheet.flatten([
-            {borderRadius: 4, flex: 1, overflow: 'hidden'},
+            {borderRadius: 4, flex: 1, overflow: 'hidden', padding: 1},
             {backgroundColor: theme.background, borderColor: theme.border}
             ]) }>
                 <Text style={{color: theme.text}}>{props.data.shortTitle}</Text>
-                <Text style={{fontSize: 10, color: theme.text, opacity: 0.5}}>{props.data.location}</Text>
+                <Text style={{fontSize: 10, color: theme.text, opacity: 0.5, padding: 1}}>{props.data.location}</Text>
+                {
+                props.data.group.length > 0 &&
+                <Text style={{fontSize: 8, color: theme.text, opacity: 0.5, padding: 1}}>{props.data.group}</Text>
+                }
             </View>
         </Pressable>
     )

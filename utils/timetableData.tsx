@@ -76,7 +76,7 @@ export async function getLessonsByID(rootURL: string, id: string){
                 day: DAYS[lesson.day],
                 startTime,
                 endTime,
-                extra_descriptions: lesson.group.length == 0 ? [] : [lesson.group] // TMP!!!
+                group: lesson.group
             })
         }
 
