@@ -7,7 +7,9 @@ import { EventData } from '@/constants/EventTypes'
 import { getLessonsByID } from '@/utils/timetableData'
 import { MaterialCommunityIcons } from '@expo/vector-icons'
 import { EventColorsType, EventColors } from '@/constants/EventColors'
-import { clearStorage, storeData } from '@/utils/localStorage'
+import { clearStorage, loadData, storeData } from '@/utils/localStorage'
+import { ConfirmationDialog } from '@/components/ConfirmationDialog'
+import { generateID, loadThemeMap } from '@/utils/eventTools'
 
 export default function DownloaderPage1() {
     const router = useRouter()
@@ -22,6 +24,8 @@ export default function DownloaderPage1() {
     const [selectAll, setSelectAll] = useState(false)
     const [selections, setSelections] = useState<number[]>([])
 
+    const [overriteModalOpen, setOverriteModalOpen] = useState(false)
+
     function onChange(val: string|null) {
         if(val != null)
             getLessonsByID(URL, val)
@@ -34,7 +38,7 @@ export default function DownloaderPage1() {
         setSelections([])
     }
 
-    async function handleSave() {
+    async function handleSaveOverrite() {
 
         if(selections.length == 0) return
 
@@ -61,6 +65,53 @@ export default function DownloaderPage1() {
 
         // get only selected lessons
         const final_lessons = lessons.filter((el) => { return selections.includes(el.id) })
+
+        // store to async storage and redirect to root
+        await clearStorage()
+        .then(() => 
+        storeData('ThemeMap', JSON.stringify([...final_theme]))
+        .then(() => 
+        storeData('eventData', JSON.stringify(final_lessons)) )
+        .then(() => {
+            router.dismissAll()
+            router.push({pathname:'/', params: {refresh: Date.now().toString()}})
+        } ))
+        
+    }
+
+    async function handleSaveAppend() {
+        if(selections.length == 0) return
+
+        // create theme map
+        let tmp_theme = new Map<string, EventColorsType>(); 
+        loadThemeMap(tmp_theme)
+
+        for (let lesson of lessons){
+            if(!tmp_theme.has(lesson.location) && lesson.location.length > 0){
+                const index = tmp_theme.size % EventColors.length
+                tmp_theme.set(lesson.location, EventColors[index])
+            }
+        }
+
+        let final_lessons:EventData[] = await loadData('eventData').then((str:string|null|undefined) => {return ((!str) ? [] : JSON.parse(str)) } )
+        const selected_lessons = lessons.filter((el) => { return selections.includes(el.id) })
+
+        for(let selected of selected_lessons){
+            selected.id = generateID(final_lessons) || -1
+            final_lessons.push(selected)
+        }
+
+        // Prune theme map to store only the ones that are needed
+        const final_theme = new Map<string, EventColorsType>()
+        for (let less of final_lessons) {
+            let loc = less.location
+            
+            if (!final_theme.has(loc)){
+                final_theme.set(loc, tmp_theme.get(loc)!) 
+            }
+            
+        }
+        
 
         // store to async storage and redirect to root
         await clearStorage()
@@ -102,6 +153,15 @@ export default function DownloaderPage1() {
     return ( 
         <View style={styles.screenContainer}>
 
+        {overriteModalOpen ?
+        <ConfirmationDialog 
+        OKtext='Overrite' OK={() => {handleSaveOverrite()}} 
+        CancelText='Append' Cancel={() => (handleSaveAppend())} 
+        Close={() =>{setOverriteModalOpen(false)}}>
+            Do you want to overrite your current lessons?
+        </ConfirmationDialog>
+        : <></>
+        }
             <Text style={styles.title}>Please select lessons</Text>
 
         <View style={styles.optionsContainer}>
@@ -137,7 +197,7 @@ export default function DownloaderPage1() {
             }
             </Pressable>
 
-            <Pressable onPress={handleSave}>
+            <Pressable onPress={() => {setOverriteModalOpen(true)}}>
             { ({pressed}) =>
                 <Text style={[styles.button, {backgroundColor: (pressed ? '#00A000ff' : '#008000')}]}>Save</Text>
             }

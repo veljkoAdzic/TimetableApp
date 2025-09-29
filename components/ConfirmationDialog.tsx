@@ -11,6 +11,7 @@ interface ConfirmDialogProps {
     Cancel: () => void,
     CancelText?: string,
     CancelStyle?: TextStyle,
+    Close?: () => void 
 }
 
 export const ConfirmationDialog = (props: ConfirmDialogProps) => {
@@ -24,7 +25,13 @@ export const ConfirmationDialog = (props: ConfirmDialogProps) => {
             <View style={styles.centeredView}>
                 <Pressable
                 style={{position: 'absolute', top: 0, left: 0, right:0, bottom: 0}}
-                onPress={() =>{props.Cancel()}}
+                onPress={() =>{
+                    if(props.Close) 
+                        props.Close() 
+                    else 
+                        props.Cancel()
+                    } 
+                }
                 />
                 <View style={styles.modalView}>
                     <Text style={styles.modalText}>{props.children}</Text>
