@@ -76,7 +76,17 @@ export default function EndpointScreen() {
                 }</Text>
             </View>
             
-            <Pressable onPress={ handleButtonPress } >
+            <View style={{flex:1, flexDirection: 'row', gap: 35}}>
+                <Pressable onPress={() => { router.back() }}>
+                { ({pressed}) =>
+                    <Text style={[styles.button, {backgroundColor: (pressed ? '#bad3ebff':'#9fc8eeff'), color: '#222'}]}>
+                        Back
+                        </Text>                
+                }
+                </Pressable>
+
+
+                <Pressable onPress={ handleButtonPress } >
                 { ({pressed}) =>
                 <Text 
                 style={[styles.button, 
@@ -88,6 +98,7 @@ export default function EndpointScreen() {
                 </Text>
                 }
             </Pressable>
+            </View>
         </View>
     )
 }
