@@ -105,7 +105,7 @@ export default function EventBlock(props: EventBlockProps){
                 <Text style={{color: theme.text}}>{shortTitle}</Text>
                 <Text style={{fontSize: 10, color: theme.text, opacity: 0.5, padding: 1}}>{props.data.location}</Text>
                 {
-                props.data.group.length > 0 &&
+                props.data.group && props.data.group.length > 0 &&
                 <Text style={{fontSize: 8, color: theme.text, opacity: 0.5, padding: 1}}>{props.data.group}</Text>
                 }
             </View>
