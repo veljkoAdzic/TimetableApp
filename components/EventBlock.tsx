@@ -59,6 +59,7 @@ const findDimensions = (data: EventData) => {
 
 export default function EventBlock(props: EventBlockProps){
     const [theme, setTheme] = useState<EventColorsType>(DefaultEventColor)
+    const shortTitle = props.data.shortTitle || formatEventTitle(props.data.title)
 
     const toggleSelection = () => {
       if(props.selectable && props.selctCallback){
@@ -77,9 +78,9 @@ export default function EventBlock(props: EventBlockProps){
         //     setTheme( getTheme(props.data.location) )
         // })
         // storeData('ThemeMap', JSON.stringify([...ThemeMap]))
-        if(!props.data.shortTitle){
-            props.data.shortTitle = formatEventTitle(props.data.title)
-        }
+        // if(!props.data.shortTitle){
+        //     props.data.shortTitle = formatEventTitle(props.data.title)
+        // }
         
       }, []);
 
@@ -101,7 +102,7 @@ export default function EventBlock(props: EventBlockProps){
             {borderRadius: 4, flex: 1, overflow: 'hidden', padding: 1},
             {backgroundColor: theme.background, borderColor: theme.border}
             ]) }>
-                <Text style={{color: theme.text}}>{props.data.shortTitle}</Text>
+                <Text style={{color: theme.text}}>{shortTitle}</Text>
                 <Text style={{fontSize: 10, color: theme.text, opacity: 0.5, padding: 1}}>{props.data.location}</Text>
                 {
                 props.data.group.length > 0 &&
