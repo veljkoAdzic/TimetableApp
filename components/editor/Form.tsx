@@ -152,9 +152,12 @@ export default function Form(props: {data: EventData, theme: EventColorsType, ed
             onChangeText={(title) => { 
                 let tmp = {...formData, title};
                 setFormData(tmp)
+                if(validateForm(tmp) != 'title')
+                    props.editCallback(tmp)
             }
             }
             onEndEditing={saveTitle}
+            
             value={formData.title}
             placeholder='Class name'
             />
@@ -166,6 +169,8 @@ export default function Form(props: {data: EventData, theme: EventColorsType, ed
             onChangeText={(shortTitle) => { 
                 let tmp = {...formData, shortTitle};
                 setFormData(tmp)
+                if(validateForm(tmp) != 'shortTitle')
+                    props.editCallback(tmp)
             }
             }
             onEndEditing={ saveShortText }
@@ -202,6 +207,8 @@ export default function Form(props: {data: EventData, theme: EventColorsType, ed
             onChangeText={(teacher) => { 
                 let tmp = {...formData, teacher};
                 setFormData(tmp)
+                if(validateForm(tmp) != 'teacher')
+                    props.editCallback(tmp)
             }
             }
             onEndEditing={ saveTeacher }
@@ -215,6 +222,8 @@ export default function Form(props: {data: EventData, theme: EventColorsType, ed
             onChangeText={(group) => { 
                 let tmp = {...formData, group};
                 setFormData(tmp)
+                if(validateForm(tmp) != 'group')
+                    props.editCallback(tmp)
             }
             }
             onEndEditing={ saveGroup }

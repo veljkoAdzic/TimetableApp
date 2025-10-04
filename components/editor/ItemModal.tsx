@@ -62,6 +62,7 @@ export default function ItemEditModal(props: {data: EventData | null, ThemeMap: 
         animationType="fade"
         transparent={true}
         visible={!!props.data}
+        statusBarTranslucent={true}
         onRequestClose={() => {
             props.editCallback(data, data.id);
             props.closeCallback(data)

@@ -7,6 +7,8 @@
   - ~~proper downloader logic and functionality~~
   - ~~when saving ask for appending selected or overrire stored lessons~~
   - ~~add title and change loading in endpointScreen.tsx~~
+  - fix netoworking ( addd support for manifest files)
+  - ~~fix input funkyness in lesson Form~~
 - Add Theme Editor
   - List locations with their colours
   - Remove location
