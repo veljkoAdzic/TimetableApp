@@ -7,7 +7,7 @@ export default function RootLayout() {
     <GestureHandlerRootView style={{flex: 1}}>
       <Drawer>
         <Drawer.Screen name="index" options={{drawerLabel: 'Timetable', title: 'Weekly Timetable'}}/>
-        <Drawer.Screen name='about' options={{drawerLabel: 'About', title: 'About Page'}} />
+        <Drawer.Screen name='themeEditor' options={{drawerLabel: 'Theme Editor', title: 'Editor for lesson themes'}} />
         <Drawer.Screen name='editor' options={{drawerLabel: 'Edit Lessons', title: 'Editor for lessons'}} />
 
         <Drawer.Screen name='devTools' options={{

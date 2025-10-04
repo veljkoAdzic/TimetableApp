@@ -34,13 +34,13 @@ export const EventColors = [
     { //light blue
         background: '#64a6d1',
         border: transparentBorder,
-        text: 'balck'
+        text: 'black'
     },
 
     { //orange
         background: '#e68332',
         border: transparentBorder,
-        text: 'balck'
+        text: 'black'
     },
 
     { //light green
