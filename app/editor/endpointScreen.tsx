@@ -76,7 +76,7 @@ export default function EndpointScreen() {
                 }</Text>
             </View>
             
-            <View style={{flex:1, flexDirection: 'row', gap: 35}}>
+            <View style={{display: 'flex', flexDirection: 'row', gap: 35}}>
                 <Pressable onPress={() => { router.back() }}>
                 { ({pressed}) =>
                     <Text style={[styles.button, {backgroundColor: (pressed ? '#bad3ebff':'#9fc8eeff'), color: '#222'}]}>
