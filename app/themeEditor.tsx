@@ -1,9 +1,12 @@
 import { View, Text, FlatList, StyleSheet } from 'react-native'
-import {useCallback, useEffect, useState} from 'react'
-import { EventColorsType } from '@/constants/EventColors'
+import {useCallback, useState} from 'react'
+import { DefaultEventColor, EventColorsType } from '@/constants/EventColors'
 import { loadThemeMap } from '@/utils/eventTools'
 import { useFocusEffect } from 'expo-router'
 import { DEVELOPER_MODE } from '@/constants/Settings'
+import Button from '@/components/Button'
+import { loadData } from '@/utils/localStorage'
+import { EventData } from '@/constants/EventTypes'
 
 function ThemeEntry(props:{text: string, theme:EventColorsType}){
 
@@ -42,6 +45,32 @@ export default function themeEditor() {
         }, [])
     );
 
+    // Remove the unused Mappings
+    async function smartCleanup() {
+        if(themeMap == null)
+            return
+
+        loadData('eventData')
+        .then((raw) => {
+            const tmp = new Map<string, EventColorsType>()
+            if(!raw || raw.length == 0){
+                setThemeMap(tmp)
+                return;
+            }
+
+            const lessons:EventData[] = JSON.parse(raw)
+
+            lessons.forEach((el) => {
+                if(!tmp.has(el.location)){
+                    tmp.set(el.location, themeMap.get(el.location) || DefaultEventColor)
+                }
+            })
+
+            setThemeMap(tmp)
+
+        })
+    }
+
     if (themeMap == null) {
         return(
             <Text>Loading...</Text>
@@ -49,18 +78,30 @@ export default function themeEditor() {
     }
 
     return (
+        <View style={styles.container}>
+            <FlatList style={styles.scrollContainer} contentContainerStyle={styles.elementsContainer}
+            data={[...themeMap]}
+            initialNumToRender={9}
+            renderItem={ ({item, index}) => 
+                <ThemeEntry key={index} text={item[0]} theme={item[1]} />
+            } 
+            />
 
-        <FlatList style={styles.scrollContainer} contentContainerStyle={styles.elementsContainer}
-        data={[...themeMap]}
-        initialNumToRender={9}
-        renderItem={ ({item, index}) => 
-            <ThemeEntry key={index} text={item[0]} theme={item[1]} />
-         } 
-        />
+            <View style={styles.navBar}>
+                <Button onPress={() => {}} buttonSyle={{backgroundColor: '#27b452', color: 'white'}} pressStyle={{backgroundColor: '#51da7a', color: '#EEE'}}>Save</Button>
+                <Button onPress={smartCleanup} buttonSyle={{backgroundColor: '#205de2', color: 'white'}} pressStyle={{backgroundColor: '#2a8fe2ff', color: '#EEE'}}>Clean</Button>
+            </View>
+        </View>
     )
 }
 
 const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        display: "flex",
+        flexDirection: 'column',
+    },
+
     scrollContainer: {
         flex: 1,
         flexDirection: 'column',
@@ -100,5 +141,19 @@ const styles = StyleSheet.create({
 
         borderColor: '#d3d3d3d3',
         borderWidth: 2.5,
+    },
+
+    navBar: {
+        height: '15%',
+        minHeight: 90,
+        // backgroundColor: '#F3F3F3',
+        elevation: 2,
+
+        display: 'flex',
+        flexDirection: 'row',
+        justifyContent: 'space-evenly',
+        alignItems: 'center',
+        paddingTop: 20,
+        paddingBottom: 30,
     }
 })
