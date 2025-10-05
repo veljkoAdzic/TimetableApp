@@ -1,23 +1,30 @@
-import { View, Text, FlatList, StyleSheet, Pressable, Modal } from 'react-native'
+import { View, Text, FlatList, StyleSheet, Pressable, Modal, TextInput } from 'react-native'
 import {useCallback, useState, createContext, useContext} from 'react'
 import { DefaultEventColor, EventColorsType } from '@/constants/EventColors'
 import { loadThemeMap } from '@/utils/eventTools'
-import { useFocusEffect } from 'expo-router'
+import { useFocusEffect, useRouter } from 'expo-router'
 import { DEVELOPER_MODE } from '@/constants/Settings'
 import Button from '@/components/Button'
-import { loadData } from '@/utils/localStorage'
+import { loadData, storeData } from '@/utils/localStorage'
 import { EventData } from '@/constants/EventTypes'
 import ThemeEntryModal from '@/components/ThemeEntryModal'
 import {ThemeEditingContext} from '@/constants/Contexts'
 
-function ThemeEntry(props:{text: string, theme:EventColorsType}){
+function ThemeEntry(props:{text: string, theme:EventColorsType, renameCallback:(old:string, newLesson:string) => void}){
     const {entry, setEntry} = useContext(ThemeEditingContext)
-
+    const [inputValue, setInputValue] = useState(props.text)
     return (
     <>    
     <Pressable onPress={()=>{setEntry([props.text, props.theme])}}>
         <View style={styles.themeEntryContainer}>
-            <Text style={styles.themeEntryText}>{props.text}</Text>
+            <TextInput 
+                        placeholder='location' 
+                        inputMode='text' 
+                        style={[styles.themeEntryText, (inputValue.length == 0) ? {borderBottomColor: 'red', backgroundColor: 'rgba(255, 195, 195, 1)'} : {}]}
+                        onChangeText={ (nextTxt) => setInputValue(nextTxt) }
+                        onEndEditing={() => { props.renameCallback(props.text, inputValue.trim())}}
+                        value={inputValue}
+                         />
             
             <View style={[styles.themePreviewMain, {backgroundColor: props.theme.background}]}>
                 <View style={[styles.themePreviewSecondary, {backgroundColor: props.theme.text}]} />
@@ -31,8 +38,10 @@ function ThemeEntry(props:{text: string, theme:EventColorsType}){
 
 export default function themeEditor() {
     const [themeMap, setThemeMap] = useState<Map<string, EventColorsType> | null>(null)
+    const [lessons, setLessons] = useState<EventData[]>([])
     const [editing, setEditing] = useState<[string, EventColorsType] | null>(null)
-
+    const router = useRouter()
+    
     useFocusEffect(
         useCallback(()=>{ // Memoising the function
             
@@ -42,47 +51,72 @@ export default function themeEditor() {
             .then(()=>{
                 setThemeMap(tmp)
             })
+            .then(() => {
+                return loadData('eventData')
+            })
+            .then((raw)=>{
+                    if(!raw)
+                        return
+                    else
+                        setLessons(JSON.parse(raw!) || [])
+
+                })
             .catch(() =>{
                 if(DEVELOPER_MODE)
                     console.error("[themeEditor>useFocusEffect]: failed to load ThemeMap!")
             })
-            
-    
+
             return () =>{} // must return function
     
         }, [])
     );
 
     // Remove the unused Mappings
-    async function smartCleanup() {
+    function smartCleanup() {
         if(themeMap == null)
             return
 
-        loadData('eventData')
-        .then((raw) => {
-            const tmp = new Map<string, EventColorsType>()
-            if(!raw || raw.length == 0){
-                setThemeMap(tmp)
-                return;
+        const tmp = new Map<string, EventColorsType>()
+        lessons.forEach((el) => {
+            if(!tmp.has(el.location)){
+                tmp.set(el.location, themeMap.get(el.location) || DefaultEventColor)
             }
-
-            const lessons:EventData[] = JSON.parse(raw)
-
-            lessons.forEach((el) => {
-                if(!tmp.has(el.location)){
-                    tmp.set(el.location, themeMap.get(el.location) || DefaultEventColor)
-                }
-            })
-
-            setThemeMap(tmp)
-
         })
+
+        setThemeMap(tmp)
+    }
+
+    // Save changes to async storage and redirect
+    async function saveToStorage() {
+        if(themeMap == null) return
+
+        storeData('ThemeMap', JSON.stringify([...themeMap]))
+        .then(() => storeData('eventData', JSON.stringify(lessons)) )
+        .then(() => router.push({pathname:'/', params: {refresh: Date.now().toString()}}) )
     }
 
     // Save editing changes to current state
     function saveEdits(val: [string, EventColorsType]) {
         const tmp = new Map(themeMap)
         tmp.set(val[0], val[1])
+        setThemeMap(tmp)
+    }
+
+    function locationRename(old:string, newName: string) {
+        if(!themeMap) return;
+        if(newName.length == 0) return
+
+        let less = lessons.map((val) => {
+            if(val.location == old)
+                return {...val, location: newName}
+            else 
+                return val
+        })
+        setLessons(less)
+
+        let tmp = new Map(themeMap) || new Map();
+        tmp.set(newName, tmp.get(old)!)
+        tmp.delete(old)
         setThemeMap(tmp)
     }
 
@@ -100,17 +134,17 @@ export default function themeEditor() {
             data={[...themeMap]}
             initialNumToRender={9}
             renderItem={ ({item, index}) => 
-                <ThemeEntry key={index} text={item[0]} theme={item[1]} />
+                <ThemeEntry key={index} text={item[0]} theme={item[1]} renameCallback={locationRename} />
             } 
             />
 
             <View style={styles.navBar}>
-                <Button onPress={() => {}} buttonSyle={{backgroundColor: '#27b452', color: 'white'}} pressStyle={{backgroundColor: '#51da7a', color: '#EEE'}}>Save</Button>
+                <Button onPress={saveToStorage} buttonSyle={{backgroundColor: '#27b452', color: 'white'}} pressStyle={{backgroundColor: '#51da7a', color: '#EEE'}}>Save</Button>
                 <Button onPress={smartCleanup} buttonSyle={{backgroundColor: '#205de2', color: 'white'}} pressStyle={{backgroundColor: '#2a8fe2ff', color: '#EEE'}}>Clean</Button>
             </View>
         </View>
 
-            <ThemeEntryModal></ThemeEntryModal>
+            <ThemeEntryModal />
         </ThemeEditingContext.Provider>
         </>
     )
@@ -145,7 +179,13 @@ const styles = StyleSheet.create({
     },
     themeEntryText: {
         fontSize: 18,
-        verticalAlign: 'middle'
+        verticalAlign: 'middle',
+        zIndex: 5, 
+        borderBottomWidth: 1, 
+        borderBottomColor: '#1113', 
+        width: '50%',
+        paddingBottom: 1,
+        paddingLeft: 6,
     },
     themePreviewMain: {
         height: 40,
