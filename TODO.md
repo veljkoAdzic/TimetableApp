@@ -7,12 +7,12 @@
   - ~~proper downloader logic and functionality~~
   - ~~when saving ask for appending selected or overrire stored lessons~~
   - ~~add title and change loading in endpointScreen.tsx~~
-  - fix netoworking ( addd support for manifest files)
+  - <u>fix netoworking ( addd support for manifest files)</u>
   - ~~fix input funkyness in lesson Form~~
 - Add Theme Editor
-  - List locations with their colours
+  - ~~List locations with their colours~~
   - Remove location
-  - Prune Theme of unused locations
+  - <u>Prune Theme of unused locations</u>
   - Edit modal with defaults and colour picker
 - Save/Share timetable as image (no screenshots like pesants)
 

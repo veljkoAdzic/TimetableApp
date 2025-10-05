@@ -1,5 +1,5 @@
-import { View, Text, FlatList, StyleSheet } from 'react-native'
-import {useCallback, useState} from 'react'
+import { View, Text, FlatList, StyleSheet, Pressable, Modal } from 'react-native'
+import {useCallback, useState, createContext, useContext} from 'react'
 import { DefaultEventColor, EventColorsType } from '@/constants/EventColors'
 import { loadThemeMap } from '@/utils/eventTools'
 import { useFocusEffect } from 'expo-router'
@@ -7,23 +7,31 @@ import { DEVELOPER_MODE } from '@/constants/Settings'
 import Button from '@/components/Button'
 import { loadData } from '@/utils/localStorage'
 import { EventData } from '@/constants/EventTypes'
+import ThemeEntryModal from '@/components/ThemeEntryModal'
+import {ThemeEditingContext} from '@/constants/Contexts'
 
 function ThemeEntry(props:{text: string, theme:EventColorsType}){
+    const {entry, setEntry} = useContext(ThemeEditingContext)
 
     return (
-    <View style={styles.themeEntryContainer}>
-        <Text style={styles.themeEntryText}>{props.text}</Text>
-        
-        <View style={[styles.themePreviewMain, {backgroundColor: props.theme.background}]}>
-            <View style={[styles.themePreviewSecondary, {backgroundColor: props.theme.text}]} />
+    <>    
+    <Pressable onPress={()=>{setEntry([props.text, props.theme])}}>
+        <View style={styles.themeEntryContainer}>
+            <Text style={styles.themeEntryText}>{props.text}</Text>
+            
+            <View style={[styles.themePreviewMain, {backgroundColor: props.theme.background}]}>
+                <View style={[styles.themePreviewSecondary, {backgroundColor: props.theme.text}]} />
+            </View>
         </View>
-    </View>
+    </Pressable>
+        
+    </>
     )
 }
 
-
 export default function themeEditor() {
     const [themeMap, setThemeMap] = useState<Map<string, EventColorsType> | null>(null)
+    const [editing, setEditing] = useState<[string, EventColorsType] | null>(null)
 
     useFocusEffect(
         useCallback(()=>{ // Memoising the function
@@ -71,6 +79,13 @@ export default function themeEditor() {
         })
     }
 
+    // Save editing changes to current state
+    function saveEdits(val: [string, EventColorsType]) {
+        const tmp = new Map(themeMap)
+        tmp.set(val[0], val[1])
+        setThemeMap(tmp)
+    }
+
     if (themeMap == null) {
         return(
             <Text>Loading...</Text>
@@ -78,6 +93,8 @@ export default function themeEditor() {
     }
 
     return (
+        <>
+        <ThemeEditingContext.Provider value={{entry: editing, setEntry: setEditing, saveChanges: saveEdits}}>
         <View style={styles.container}>
             <FlatList style={styles.scrollContainer} contentContainerStyle={styles.elementsContainer}
             data={[...themeMap]}
@@ -92,6 +109,10 @@ export default function themeEditor() {
                 <Button onPress={smartCleanup} buttonSyle={{backgroundColor: '#205de2', color: 'white'}} pressStyle={{backgroundColor: '#2a8fe2ff', color: '#EEE'}}>Clean</Button>
             </View>
         </View>
+
+            <ThemeEntryModal></ThemeEntryModal>
+        </ThemeEditingContext.Provider>
+        </>
     )
 }
 
