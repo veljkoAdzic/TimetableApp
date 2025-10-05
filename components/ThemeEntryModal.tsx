@@ -1,4 +1,4 @@
-import {View, Text, Modal, StyleSheet, Pressable } from 'react-native'
+import {View, Text, Modal, StyleSheet, Pressable, FlatList } from 'react-native'
 import {ThemeEditingContext} from '@/constants/Contexts'
 import { useContext, useState } from 'react'
 import { EventColorsType, EventColors } from '@/constants/EventColors'
@@ -44,26 +44,39 @@ export default function ThemeEntryModal(){
                         {entry[0]}
                     </Text>
 
-                    <View style={[styles.previewBlock, {backgroundColor: entry[1].background, borderColor: entry[1].border}]}>
-                        <Text style={{color: entry[1].text}}>Title</Text>
-                        <Text style={{color: entry[1].text, fontSize:10, opacity: 0.5}}>Sub Text 1</Text>
-                        <Text style={{color: entry[1].text, fontSize: 9, opacity: 0.5}}>Sub Text 2</Text>
+                    <View style={styles.previewPickerContainer}>
+
+                        <View style={styles.colourPickerGroup}>
+                            <Text style={{fontSize: 15}}>Preview</Text>
+                        <View style={[styles.previewBlock, {backgroundColor: entry[1].background, borderColor: entry[1].border}]}>
+                            <Text style={{color: entry[1].text}}>Title</Text>
+                            <Text style={{color: entry[1].text, fontSize:10, opacity: 0.5}}>Sub Text 1</Text>
+                            <Text style={{color: entry[1].text, fontSize: 9, opacity: 0.5}}>Sub Text 2</Text>
+                        </View>
+                        </View>
+
+                        <View style={styles.colourPickerGroup}>
+                            <Text style={{fontSize: 15}}>Current</Text>
+
+                            <View style={styles.pickerContainer}>
+                                <Pressable onPress={() => { console.log("L") }} style={{flexGrow: 1, borderTopLeftRadius: 7, borderTopRightRadius: 7, backgroundColor: entry[1].background}} />
+
+                                <Pressable onPress={() => { console.log("R")}} style={{flexGrow: 1, borderBottomLeftRadius: 7, borderBottomRightRadius: 7, backgroundColor: entry[1].text}} />
+                            </View>
+                        </View>
                     </View>
 
-                    <View></View>
-
-                    <View style={styles.coloursContainer}>
-                    {
-                        EventColors.map( (colours, index) => {
-                            if (index >= 9) return <></>
-
-                            return (
-                                <ColourButton key={index} theme={colours} onClick={() => { setEntry([entry[0], colours]) } } />
-                            )
-                        }
-                        )
-                    }
-                    </View>
+                    <FlatList fadingEdgeLength={15} style={styles.coloursContainer} contentContainerStyle={{gap: 15, padding: 10, paddingBottom: 20}} snapToInterval={50}
+                        data={Array(Math.ceil(EventColors.length/3)).map((_, ind) =>  {return [ind*3, ind*3+1, ind*3+2] })}
+                        initialNumToRender={9}
+                        renderItem={ ({item, index}) => 
+                            <View key={index} style={{width: '100%', display: 'flex', flexDirection: 'row', justifyContent: 'space-between'}}>
+                            <ColourButton theme={EventColors[index*3+0]} onClick={() => { setEntry([entry[0], EventColors[index*3+0]]) } } />
+                            <ColourButton theme={EventColors[index*3+1]} onClick={() => { setEntry([entry[0], EventColors[index*3+1]]) } } />
+                            <ColourButton theme={EventColors[index*3+2]} onClick={() => { setEntry([entry[0], EventColors[index*3+2]]) } } />
+                            </View>
+                        } 
+                        />
 
                     <View style={styles.editBar}>
                         <Pressable
@@ -103,7 +116,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         elevation: 5,
         width: "80%",
-        gap: 15,
+        gap: 25,
     },
     title: {
         width: '100%', 
@@ -112,21 +125,51 @@ const styles = StyleSheet.create({
         borderBottomWidth: 1, 
         paddingLeft: 5, 
     },
+
+    previewPickerContainer: {
+        display: 'flex', 
+        flexDirection: 'row', 
+        gap: 15, 
+        alignItems: 'flex-start', 
+        justifyContent: 'space-evenly',
+        borderBottomWidth: 1,
+        borderColor: "#11111155",
+        width: '100%',
+    },
+
     previewBlock: {
         padding: 2,
         borderWidth: 1,
         borderRadius: 6,
         minWidth: 80,
         minHeight: 80,
+        
+    },
+
+    colourPickerGroup: {
+        display: 'flex', 
+        gap: 15, 
+        alignItems: 
+        'center',
+        paddingBottom: 15,
+    },
+
+    pickerContainer: {
+        borderRadius: 10, 
+        display: 'flex', 
+        overflow: 'hidden', 
+        gap: 2, 
+        borderWidth: 2, 
+        borderColor: '#CCC', 
+        width: 50, 
+        height: 100, 
+        padding: 1,
+        backgroundColor: '#EEE'
     },
 
     coloursContainer: {
         display: 'flex', 
-        flexDirection: 'row', 
-        flexWrap: 'wrap', 
-        width: '85%', 
-        justifyContent: 'space-between', 
-        gap: 25
+        height: "12%",
     },
 
     themeButtonMain: {
