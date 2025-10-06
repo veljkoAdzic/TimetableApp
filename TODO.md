@@ -9,21 +9,29 @@
   - ~~add title and change loading in endpointScreen.tsx~~
   - <u>fix netoworking ( addd support for manifest files)</u>
   - ~~fix input funkyness in lesson Form~~
-- Add Theme Editor
+- ~~Add Theme Editor~~
   - ~~List locations with their colours~~
-  - Remove location
-  - <u>Prune Theme of unused locations</u>
-  - Edit modal with defaults and colour picker
-- Save/Share timetable as image (no screenshots like pesants)
+  - ~~Remove location~~ (Not implemented and it should probably not be until further notice)
+  - ~~Prune Theme of unused locations~~
+  - ~~Edit modal with defaults and colour picker~~
+- Save/Share timetable
+  - as image (no screenshots like pesants)
 
 ## Priority 2
 
 - Change loading state display to be prettier of TimetableScreen.tsx
-- Settings tab maybe?
-- Save/Share timetable as link (probably as `ttshare://[username].me?data=[encoded data]` ) \* Note 1
+- ## Settings tab
+  - Toggle between location and lesson (id) theme mapping
+- Save/Share timetable
+  - as link (probably as `ttshare://[username].me?data=[encoded data]` ) \* Note 1
+  - as QR (raw binary that is encoded similar to above)
+    -Export/Import from file
 - Add information modal in endpointScreen so when (?) button is pressed info is displayed
 - Add a current time line in TimetableScreen.tsx to show when in the timetable is the user currently
-- When pressing lesson in TimetableScreen.tsx show preview modal with more information
+- When hold pressing lesson in TimetableScreen.tsx show preview modal with more information, and when pressing shift the zindex to move up/down to show overlaping lessons
+- Make the ability to change theme in Lesson editor modal directly (no need to save and switch between drawers)
+- Improve designs with dropshadow
+- Refactor editor to use context and to use newer components
 
 # NOTES
 

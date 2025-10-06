@@ -9,15 +9,19 @@
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSAppTransortSecurity": {
+          "NSAllowsArbitraryLoads": true
+        }
+      }
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
+        "backgroundColor": "#0000"
       },
-      "package": "com.veljkoa.TimetableApp",
-      "useCleartextTraffic": true
+      "package": "com.veljkoa.TimetableApp"
     },
     "web": {
       "bundler": "metro",
@@ -34,7 +38,13 @@
           "resizeMode": "contain",
           "backgroundColor": "#ffffff"
         }
-      ]
+      ],
+      "expo-build-properties",
+      {
+        "android": {
+          "useCleartextTraffic": true
+        }
+      }
     ],
     "experiments": {
       "typedRoutes": true
