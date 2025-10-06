@@ -103,6 +103,11 @@ export default function themeEditor() {
     }
 
     function locationRename(old:string, newName: string) {
+        old = old.trim()
+        newName = newName.trim()
+        
+        if(old == newName) return
+
         if(!themeMap) return;
         if(newName.length == 0) return
 
