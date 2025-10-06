@@ -15,7 +15,8 @@ export default function Button(props: {onPress: () => void, buttonSyle?: TextSty
                 paddingVertical: 6, 
                 color: 'white', 
                 fontSize: 24,
-                borderRadius: 6
+                borderRadius: 6,
+                elevation: 3
                 }, 
                 StyleSheet.flatten([btnStyle, (pressed ? pressedStyle : {} )]) 
             ]}

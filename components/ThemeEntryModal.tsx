@@ -4,8 +4,10 @@ import { useContext, useState } from 'react'
 import { EventColorsType, EventColors } from '@/constants/EventColors'
 import { MaterialCommunityIcons } from '@expo/vector-icons'
 import ColorPicker, {Panel1, Swatches, Preview, OpacitySlider, HueSlider, InputWidget, SaturationSlider, LuminanceSlider, BrightnessSlider } from 'reanimated-color-picker'
-function ColourButton(props:{theme: EventColorsType, onClick:() => void}){
 
+import Animated, {useSharedValue, withTiming, useAnimatedStyle, interpolateColor} from 'react-native-reanimated'
+
+function ColourButton(props:{theme: EventColorsType, onClick:() => void}){
     return (
         <Pressable onPress={() => {           
                 props.onClick()
@@ -24,6 +26,24 @@ function ColourButton(props:{theme: EventColorsType, onClick:() => void}){
 export default function ThemeEntryModal(){
     const {entry, setEntry, saveChanges} = useContext(ThemeEditingContext)
     const [tabFocused, setTabFocused] = useState<'background' | 'text'>('background')
+
+    // Tab animations
+    const tabIndex = useSharedValue(tabFocused === 'background' ? 0 : 1);
+    const backgroundTabStyle = useAnimatedStyle(() => ({
+        backgroundColor: interpolateColor(
+            tabIndex.value,
+            [0, 1],
+            ['white', '#DDD']
+        ),
+    }))
+    const textTabStyle = useAnimatedStyle(() => ({
+        backgroundColor: interpolateColor(
+            tabIndex.value,
+            [0, 1],
+            ['#DDD', 'white']
+        ),
+    }));
+
 
     if (entry == null){
         return <></>
@@ -47,15 +67,19 @@ export default function ThemeEntryModal(){
                 
 
                     <View style={styles.tabBar}>
-                        <Pressable style={[styles.tab, (tabFocused != 'background' ? {backgroundColor: '#DDD', borderBottomRightRadius: 5} : {})]}
-                        onPress={() => {setTabFocused('background')}}>
-                            <Text style={{}}>Background</Text>
-                        </Pressable>
+                        <Animated.View style={[styles.tab, backgroundTabStyle, {borderBottomRightRadius: 5}]} >
+                            <Pressable style={{width: '100%', height: '100%', justifyContent: 'center', alignItems: 'center'}}
+                            onPress={() => {setTabFocused('background'); tabIndex.value = withTiming(0, { duration: 100 });}}>
+                                <Text style={{}}>Background</Text>
+                            </Pressable>
+                        </Animated.View>
 
-                        <Pressable style={[styles.tab, (tabFocused != 'text' ? {backgroundColor: '#DDD', borderBottomLeftRadius: 5} : {})]}
-                        onPress={() => {setTabFocused('text')}}>
-                            <Text>Text</Text>
-                        </Pressable>
+                        <Animated.View style={[styles.tab, textTabStyle, {borderBottomLeftRadius: 5}]} >
+                            <Pressable style={{width: '100%', height: '100%', justifyContent: 'center', alignItems: 'center'}}
+                            onPress={() => {setTabFocused('text'); tabIndex.value = withTiming(1, { duration: 100 });}}>
+                                <Text>Text</Text>
+                            </Pressable>
+                        </Animated.View>
                     </View>
 
                     <Text style={styles.title}>
@@ -83,7 +107,7 @@ export default function ThemeEntryModal(){
                             setEntry([entry[0], newColor])
                         } } 
                         >
-                            <View style={{display: 'flex', flexDirection: 'column', gap: 10, width: 170, backgroundColor: '#FAFAFA', padding: 10, borderRadius: 5, borderWidth: 1, borderColor: '#DDD'}}>
+                            <View style={styles.pickerContainer}>
                                 <Panel1 style={{aspectRatio: 1/1, width: '100%', height: 'auto'}} />
                                 
                                 <HueSlider style={{}} />
@@ -139,8 +163,6 @@ const styles = StyleSheet.create({
         margin: 20,
         backgroundColor: 'white',
         borderRadius: 20,
-        // padding: 35,
-        // paddingVertical: 5,
         alignItems: 'center',
         elevation: 5,
         width: "80%",
@@ -153,10 +175,11 @@ const styles = StyleSheet.create({
         display: 'flex', 
         flexDirection: 'row', 
         overflow: 'hidden', 
-        height: 45,
+        height: 47,
         paddingBottom: 3,
-        borderBlockColor: '#EEE',
+        borderBottomColor: '#EEE',
         borderBottomWidth: 1,
+        // elevation: 1
     },
 
     tab: {
@@ -192,7 +215,7 @@ const styles = StyleSheet.create({
         borderRadius: 6,
         minWidth: 80,
         minHeight: 90,
-        
+        elevation: 5
     },
 
     colourPickerGroup: {
@@ -205,16 +228,16 @@ const styles = StyleSheet.create({
     },
 
     pickerContainer: {
-        borderRadius: 10, 
         display: 'flex', 
-        overflow: 'hidden', 
-        gap: 2, 
-        borderWidth: 2, 
-        borderColor: '#CCC', 
-        width: 50, 
-        height: 100, 
-        padding: 1,
-        backgroundColor: '#EEE'
+        flexDirection: 'column', 
+        gap: 10, 
+        width: 170, 
+        backgroundColor: '#FAFAFA', 
+        padding: 10, 
+        borderRadius: 5, 
+        borderWidth: 1, 
+        borderColor: '#DDD',
+        elevation: 3,
     },
 
     coloursContainer: {
@@ -228,7 +251,8 @@ const styles = StyleSheet.create({
         aspectRatio: 1/1,
         borderRadius: '50%',
         overflow: 'hidden',
-        // elevation: 3,
+        borderColor: '#F0F0F0',
+        borderWidth: 1,
     },
     themeButtonSecondary: {
         width: '150%',

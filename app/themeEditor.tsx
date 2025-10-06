@@ -134,7 +134,7 @@ export default function themeEditor() {
             data={[...themeMap]}
             initialNumToRender={9}
             renderItem={ ({item, index}) => 
-                <ThemeEntry key={index} text={item[0]} theme={item[1]} renameCallback={locationRename} />
+                <ThemeEntry key={`${index}-${item[0]}`} text={item[0]} theme={item[1]} renameCallback={locationRename} />
             } 
             />
 
