@@ -189,8 +189,9 @@ export default function Form(props: {data: EventData, theme: EventColorsType, ed
             </View>
 
             {/* Location TextInput */}
+            <View style={{flexDirection: 'row'}}>
             <TextInput
-            style={[styles.input, {color: props.theme.text}, (formErrors.includes('location'))? styles.error : {}]}
+            style={[styles.input, {color: props.theme.text, flexGrow: 1}, (formErrors.includes('location'))? styles.error : {}]}
             onChangeText={(location) => { 
                 let tmp = {...formData, location}
                 setFormData(tmp)
@@ -200,6 +201,12 @@ export default function Form(props: {data: EventData, theme: EventColorsType, ed
             value={formData.location}
             placeholder='Location'
             />
+            <Pressable style={styles.button} onPress={() => { 
+                console.log("Colour Change")
+             }}>
+            <MaterialCommunityIcons name="palette" color={props.theme.text} size={24} />
+            </Pressable>
+            </View>
 
             {/* Teachers TextInput */}
             <TextInput

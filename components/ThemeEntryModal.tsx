@@ -1,4 +1,4 @@
-import {View, Text, Modal, StyleSheet, Pressable, FlatList } from 'react-native'
+import {View, Text, Modal, StyleSheet, Pressable, FlatList, TextInput } from 'react-native'
 import {ThemeEditingContext} from '@/constants/Contexts'
 import { useContext, useState } from 'react'
 import { EventColorsType, EventColors } from '@/constants/EventColors'
@@ -12,7 +12,7 @@ function ColourButton(props:{theme: EventColorsType, onClick:() => void}){
         <Pressable onPress={() => {           
                 props.onClick()
             } } 
-            style={{padding: 4}}
+            style={{padding: 8}}
             >
             <View style={{padding: 2, borderRadius: '50%', borderWidth: 1, borderColor: '#DDD', justifyContent: 'center', alignItems: 'center', elevation: 2, backgroundColor: '#F5F5F5'}} >
                 <View style={[styles.themeButtonMain, {backgroundColor: props.theme.background}]}>
@@ -54,6 +54,8 @@ export default function ThemeEntryModal(){
         animationType="fade"
         transparent={true}
         visible={entry != null}
+        statusBarTranslucent
+        style={{position: 'absolute', top: 0, left: 0, right:0, bottom: 0 }}
         onRequestClose={() => {}}>
             <View style={styles.centeredView}>
                 <Pressable
@@ -70,7 +72,7 @@ export default function ThemeEntryModal(){
                         <Animated.View style={[styles.tab, backgroundTabStyle, {borderBottomRightRadius: 5}]} >
                             <Pressable style={{width: '100%', height: '100%', justifyContent: 'center', alignItems: 'center'}}
                             onPress={() => {setTabFocused('background'); tabIndex.value = withTiming(0, { duration: 100 });}}>
-                                <Text style={{}}>Background</Text>
+                                <Text>Background</Text>
                             </Pressable>
                         </Animated.View>
 
@@ -116,7 +118,7 @@ export default function ThemeEntryModal(){
                         </View>
                     </View>
 
-                    <FlatList fadingEdgeLength={15} style={styles.coloursContainer} contentContainerStyle={{gap: 15, padding: 10, paddingBottom: 20}}
+                    <FlatList fadingEdgeLength={15} style={styles.coloursContainer} contentContainerStyle={{gap: 7, padding: 10, paddingBottom: 20}}
                         data={Array(Math.ceil(EventColors.length/3)).map((_, ind) =>  {return [ind*3, ind*3+1, ind*3+2] })}
                         initialNumToRender={9}
                         renderItem={ ({item, index}) => 
@@ -140,7 +142,7 @@ export default function ThemeEntryModal(){
                         onPress={() =>{ setEntry(null); }}
                         style={styles.editBarButton}
                         >
-                            <MaterialCommunityIcons name="delete" size={28} color={'#151515'} />
+                            <MaterialCommunityIcons name="close" size={29} color={'#151515'} />
                         </Pressable>
                     </View>
 
