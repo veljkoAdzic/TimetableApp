@@ -213,7 +213,7 @@ const styles = StyleSheet.create({
         height: '15%',
         minHeight: 90,
         // backgroundColor: '#F3F3F3',
-        elevation: 2,
+        elevation: 15,
 
         display: 'flex',
         flexDirection: 'row',
@@ -221,5 +221,13 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         paddingTop: 20,
         paddingBottom: 30,
+
+        backgroundColor: '#f0f1f2',
+        // minHeight: '15%',
+        borderWidth: 1,
+        borderColor: '#E3E3E3',
+        borderTopLeftRadius: 16,
+        borderTopRightRadius: 16,
+        // paddingBottom: '5%',
     }
 })

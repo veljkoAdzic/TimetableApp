@@ -1,16 +1,17 @@
-import { View, FlatList, Text, StyleSheet, Pressable} from 'react-native'
-import React, { useCallback, useEffect, useState } from 'react'
+import { View, FlatList, Text, StyleSheet, Animated, Pressable} from 'react-native'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { DAYS, DefaultEventData, EventData } from '@/constants/EventTypes'
 import { loadData } from '@/utils/localStorage'
 import { formatEventTitle, generateID, loadThemeMap } from '@/utils/eventTools'
 import { EventColorsType, EventColors } from '@/constants/EventColors'
-import EditorButtons from '@/components/editor/Buttons'
 import { DEVELOPER_MODE } from '@/constants/Settings'
 import Item from '@/components/editor/Item'
 import { storeData } from '@/utils/localStorage'
 import { useRouter, useFocusEffect } from 'expo-router'
 import { ConfirmationDialog } from '@/components/ConfirmationDialog'
 import ItemEditModal from '@/components/editor/ItemModal'
+import { MaterialCommunityIcons } from '@expo/vector-icons'
+import Button from '@/components/Button'
 
 interface EditorProps {
     data?: EventData[]
@@ -25,8 +26,7 @@ function Title(props: {text: string}) {
     )
 }
 
-const SECTIONS_END = ".IGNORE"
-const sections = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Others', SECTIONS_END]
+const sections = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Others']
 
 const ThemeMap = new Map<string, EventColorsType>()
 
@@ -84,6 +84,65 @@ export default function Editor(props: EditorProps) {
     }, [])
     );
 
+    // Big buttons stuff
+    const rotation = useRef(new Animated.Value(0)).current;
+    const editY  = useRef(new Animated.Value(0)).current;
+    const downloadY  = useRef(new Animated.Value(0)).current;
+    const [BBopen, setBBOpen] = useState(false);
+
+     const rotateTo = (toValue: number) => {
+        Animated.timing( rotation, {
+            toValue,
+            duration: 100,
+            useNativeDriver: true,
+        }).start();
+    }
+    const moveEdit = (toValue: number) => {
+        Animated.timing( editY, {
+            toValue,
+            duration: 250,
+            useNativeDriver: true,
+        }).start();
+    }
+    const moveDownload = (toValue: number) => {
+        Animated.timing( downloadY, {
+            toValue,
+            duration: 150,
+            useNativeDriver: true,
+        }).start();
+    }
+    const toggleOpening = () => {
+        rotateTo(BBopen ? 0 : 1)
+        moveDownload(BBopen ? 0 : 1)
+        moveEdit(BBopen ? 0 : 1)
+        setBBOpen(!BBopen)
+    }
+    const editBBStyle = {
+        transform: [{
+            "translateY": editY.interpolate({
+                inputRange: [0, 1],
+                outputRange: [0, -155]
+            })
+        }]
+    }
+    const downloadBBStyle = {
+        transform: [{
+            "translateY": downloadY.interpolate({
+                inputRange: [0, 1],
+                outputRange: [0, -85]
+            })
+        }]
+    }
+    const rotationBBStyle = {
+        transform: [{
+            "rotate": rotation.interpolate({
+                inputRange: [0, 1],
+                outputRange: ['0deg', '45deg'],
+            }),
+        }]
+    }
+    //~
+
     if(loading){
         return (
             <View>
@@ -127,46 +186,13 @@ export default function Editor(props: EditorProps) {
 
     const RenderedSections = React.memo(
         ({item, index, data}: {item: string, index: number, data: EventData[]}) =>{
-        if(item == SECTIONS_END){
-            return(
-                <View key={item} style={styles.section}>
-                    
-                <View style={[styles.title, {opacity: 1, justifyContent: 'space-evenly', gap: 10, marginTop: 50 , width: '80%'}]}>
-                
-                    
-                    <Pressable
-                    onPress={ () => {
-                        // SAVE
-                        storeData('ThemeMap', JSON.stringify([...ThemeMap]))
-                        .then(() => storeData('eventData', JSON.stringify(data)) )
-                        .then(() => router.push({pathname:'/', params: {refresh: Date.now().toString()}}) )
-                    } }
-                    >
-                        <Text style={[styles.button, {backgroundColor: 'green'}]}>Save</Text>
-                    </Pressable>
-
-                    <Pressable
-                    onPress={ () => {
-                        // DISCARD
-                        setCDvisible(true)
-                    } }
-                    >
-                        <Text style={[styles.button, {backgroundColor: 'red'}]}>Discard</Text>
-                    </Pressable>
-
-
-                </View> 
-                </View>
-            )
-        }
-
         return (
             <View key={item} style={styles.section}>
                 <Title text ={item} />
                 <View style={styles.itemContainer}>
                     {
-                        data.filter((event) => (index != sections.length-2 && event.day == DAYS[index]) || 
-                                                (index == sections.length-2 && !DAYS.includes(event.day))
+                        data.filter((event) => (index != sections.length-1 && event.day == DAYS[index]) || 
+                                                (index == sections.length-1 && !DAYS.includes(event.day))
                                     )
                         .map((tile, j) => {
                             return <Item key={tile.id} data={tile} theme={ThemeMap.get(tile.location)} openCallback={openEditingItem} />
@@ -194,6 +220,8 @@ export default function Editor(props: EditorProps) {
             <></>
             }
 
+            
+
 
             <ItemEditModal 
             key={openItem?.id ?? 'new'} 
@@ -214,14 +242,71 @@ export default function Editor(props: EditorProps) {
             )} } 
             />
 
-            <EditorButtons editButtonFunction={createNewLesson}/>
+            { BBopen ? 
+                <Pressable style={styles.cancelArea} onPress={toggleOpening} /> :
+                <></>
+            }
+
+            <View style={styles.bottomBar}>
+                <Button onPress={
+                () => {
+                    // SAVE
+                    storeData('ThemeMap', JSON.stringify([...ThemeMap]))
+                    .then(() => storeData('eventData', JSON.stringify(data)) )
+                    .then(() => router.push({pathname:'/', params: {refresh: Date.now().toString()}}) )
+                }} 
+                buttonSyle={{backgroundColor: '#22aa22ff', color: '#FFF'}} 
+                pressStyle={{backgroundColor: '#38be38ff', color: '#EEE'}} >
+                    Save
+                </Button>
+
+                <Button onPress={() => {/* DISCARD */ setCDvisible(true)}}
+                buttonSyle={{backgroundColor: '#e91f30ff', color: '#FFF'}}
+                pressStyle={{backgroundColor: '#fc4c5bff', color: '#EEE'}}>
+                    Discard
+                </Button>
+
+                {/* Big animated buttons */}
+                <View style={[styles.bigButtonWraper]}>
+                    <View style={styles.buttonContainer}>
+
+                        <Animated.View style={[styles.bigButton, editBBStyle]}>
+                            <Pressable style={{padding: 10}}
+                            onPress={() => { toggleOpening(); createNewLesson(); }}>
+                                <MaterialCommunityIcons name="pencil-plus" size={40} color='#eee' />
+                            </Pressable>
+                        </Animated.View>
+                    
+                        <Animated.View style={[styles.bigButton, downloadBBStyle]}>
+                            <Pressable style={{padding: 10}}
+                            onPress={() => { toggleOpening(); router.push("/editor/endpointScreen") }}>
+                                    <MaterialCommunityIcons name="cloud-download" size={40} color='#eee' />
+                            </Pressable>
+                        </Animated.View> 
+                            
+
+                        <Animated.View style={[styles.bigButton, rotationBBStyle, BBopen ? {backgroundColor: '#2f3646ff'}:{} ]}>
+                            <Pressable style={{padding: 10}}
+                            onPress={toggleOpening}>
+                                <MaterialCommunityIcons name="plus" size={50} color='#eee' />
+                            </Pressable>
+                        </Animated.View>
+                    </View>
+                </View>
+
+            </View>
+
+            
+
         </View>
     )
 }
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1
+        flex: 1,
+        display: 'flex',
+        flexDirection: 'column',
     },
     scrollContainer: {
         flex: 1,
@@ -253,14 +338,57 @@ const styles = StyleSheet.create({
         gap: '3%',
         padding: '1%',
         minHeight: 50,
-        
         paddingHorizontal: 15
     },
-    button: { 
-        paddingHorizontal: 18, 
-        paddingVertical: 6, 
-        color: 'white', 
-        fontSize: 24,
-        borderRadius: 6,
+    bottomBar: {
+        width: '100%',
+        display: 'flex',
+        flexDirection: 'row',
+        justifyContent: 'space-evenly',
+        alignItems: 'center',
+        backgroundColor: '#f0f1f2',
+        minHeight: '15%',
+        borderWidth: 1,
+        borderColor: '#E5E5E5',
+        borderTopLeftRadius: 16,
+        borderTopRightRadius: 16,
+        paddingBottom: '5%',
+        elevation: 15,
+        zIndex: 10
+    },
+
+    bigButtonWraper: {
+        zIndex: 10,
+        width: 72, 
+        aspectRatio: 1/1,
+        display: 'flex',
+        flexDirection: 'row',
+        alignItems: 'stretch',
+        justifyContent: 'center',
+    },
+    buttonContainer: {
+        alignItems: 'center',
+        justifyContent: 'center',
+        zIndex: 10
+    },
+    bigButton :{
+        borderRadius: "50%",
+        backgroundColor: '#212631',
+        justifyContent: 'center',
+        alignItems: 'center',
+        aspectRatio: 1/1,
+        position: 'absolute',
+        bottom: 0,
+        elevation: 2,
+        zIndex: 10
+    },
+    cancelArea: {
+        position: 'absolute',
+        top: 0,
+        bottom: 0,
+        left: 0,
+        right: 0,
+        zIndex: 1,
     }
+        
 })

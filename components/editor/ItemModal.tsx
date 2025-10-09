@@ -53,7 +53,7 @@ export default function ItemEditModal(props: {data: EventData | null, ThemeMap: 
             }}
             OKtext="Delete"
             Cancel={()=>{ setCDvisible(false) }}>
-                Are you sure you want to delete this class?
+                Are you sure you want to delete this lesson?
             </ConfirmationDialog>
             : <></>
         }

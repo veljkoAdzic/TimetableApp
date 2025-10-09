@@ -1,5 +1,6 @@
 import React, {useState} from 'react'
 import {Modal, View, Text, Pressable, StyleSheet, ColorValue, TextStyle } from 'react-native'
+import Button from './Button'
 
 export interface ConfirmationDialogStateType {visible: boolean, text: string}
 
@@ -15,10 +16,15 @@ interface ConfirmDialogProps {
 }
 
 export const ConfirmationDialog = (props: ConfirmDialogProps) => {
+
+    const finalCancelStyle:TextStyle = StyleSheet.flatten([styles.button, {backgroundColor: '#EB0000'}, props.CancelStyle]);
+    const finalOKStyle:TextStyle = StyleSheet.flatten([styles.button, {backgroundColor: '#008000'}, props.OKstyle])
+
     return (
         <Modal
         animationType="fade"
         transparent={true}
+        statusBarTranslucent={true}
         visible={true}
         onRequestClose={() => {}}>
 
@@ -37,18 +43,22 @@ export const ConfirmationDialog = (props: ConfirmDialogProps) => {
                     <Text style={styles.modalText}>{props.children}</Text>
                     
                     <View style={styles.btnContainer}>
-                        <Pressable style={{padding: 10}}
+                        {/* <Pressable style={{padding: 10}}
                             onPress={() => { props.Cancel()  }}>
                                 <Text style={[styles.button, {backgroundColor: 'red'}, props.CancelStyle]}>
                                     {props.CancelText || "Cancel"}
                                     </Text>
-                        </Pressable>
-                        <Pressable style={{padding: 10}}
+                        </Pressable> */}
+
+                        <Button onPress={props.Cancel} buttonSyle={finalCancelStyle} pressStyle={{backgroundColor: '#F22'}}>{props.CancelText || "Cancel"}</Button>
+
+                        <Button onPress={props.OK} buttonSyle={finalOKStyle} pressStyle={{backgroundColor: '#30A030'}} >{props.OKtext || "OK"}</Button>
+                        {/* <Pressable style={{padding: 10}}
                             onPress={() => { props.OK()  }}>
-                                <Text style={[styles.button, {backgroundColor: 'green'}, props.OKstyle]}>
+                                <Text style={finalOKStyle}>
                                     {props.OKtext || "OK"}
                                     </Text>
-                        </Pressable>
+                        </Pressable> */}
                     </View>
                 </View>
             </View>
@@ -79,16 +89,17 @@ const styles = StyleSheet.create({
     button: {
         fontSize: 19,
         color: 'white',
-        padding: 15,
+        paddingHorizontal: 15,
+        paddingVertical: 15,
         minWidth: 80,
         textAlign: 'center',
         borderRadius: 10,
-        
+        margin: 10,
     },
     btnContainer: {
         flexDirection: 'row',
         justifyContent: 'space-around',
-        alignItems: 'baseline',
+        alignItems: 'center',
         width: '100%',
         marginTop: 24,
     }
