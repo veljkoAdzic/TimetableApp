@@ -20,18 +20,19 @@
 ## Priority 2
 
 - Change loading state display to be prettier of TimetableScreen.tsx
-- ## Settings tab
+- Settings tab
   - Toggle between location and lesson (id) theme mapping
 - Save/Share timetable
   - as link (probably as `ttshare://[username].me?data=[encoded data]` ) \* Note 1
   - as QR (raw binary that is encoded similar to above)
-    -Export/Import from file
+  - Export/Import from file
 - Add information modal in endpointScreen so when (?) button is pressed info is displayed
 - Add a current time line in TimetableScreen.tsx to show when in the timetable is the user currently
 - When hold pressing lesson in TimetableScreen.tsx show preview modal with more information, and when pressing shift the zindex to move up/down to show overlaping lessons
 - Make the ability to change theme in Lesson editor modal directly (no need to save and switch between drawers)
 - Improve designs with dropshadow
 - Refactor editor to use context and to use newer components
+- Implementation of scraping directly from WebView component by reaching `vapi://local.tt`
 
 # NOTES
 

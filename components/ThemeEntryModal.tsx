@@ -3,7 +3,7 @@ import {ThemeEditingContext} from '@/constants/Contexts'
 import { useContext, useState } from 'react'
 import { EventColorsType, EventColors } from '@/constants/EventColors'
 import { MaterialCommunityIcons } from '@expo/vector-icons'
-import ColorPicker, {Panel1, Swatches, Preview, OpacitySlider, HueSlider, InputWidget, SaturationSlider, LuminanceSlider, BrightnessSlider } from 'reanimated-color-picker'
+import ColorPicker, {Panel1, HueSlider} from 'reanimated-color-picker'
 
 import Animated, {useSharedValue, withTiming, useAnimatedStyle, interpolateColor} from 'react-native-reanimated'
 
@@ -14,7 +14,7 @@ function ColourButton(props:{theme: EventColorsType, onClick:() => void}){
             } } 
             style={{padding: 8}}
             >
-            <View style={{padding: 2, borderRadius: '50%', borderWidth: 1, borderColor: '#DDD', justifyContent: 'center', alignItems: 'center', elevation: 2, backgroundColor: '#F5F5F5'}} >
+            <View style={styles.themeButtonOuter} >
                 <View style={[styles.themeButtonMain, {backgroundColor: props.theme.background}]}>
                     <View style={[styles.themeButtonSecondary, {backgroundColor: props.theme.text}]} />
                 </View>
@@ -70,14 +70,14 @@ export default function ThemeEntryModal(){
 
                     <View style={styles.tabBar}>
                         <Animated.View style={[styles.tab, backgroundTabStyle, {borderBottomRightRadius: 5}]} >
-                            <Pressable style={{width: '100%', height: '100%', justifyContent: 'center', alignItems: 'center'}}
+                            <Pressable style={styles.tabPressable}
                             onPress={() => {setTabFocused('background'); tabIndex.value = withTiming(0, { duration: 100 });}}>
                                 <Text>Background</Text>
                             </Pressable>
                         </Animated.View>
 
                         <Animated.View style={[styles.tab, textTabStyle, {borderBottomLeftRadius: 5}]} >
-                            <Pressable style={{width: '100%', height: '100%', justifyContent: 'center', alignItems: 'center'}}
+                            <Pressable style={styles.tabPressable}
                             onPress={() => {setTabFocused('text'); tabIndex.value = withTiming(1, { duration: 100 });}}>
                                 <Text>Text</Text>
                             </Pressable>
@@ -91,7 +91,6 @@ export default function ThemeEntryModal(){
                     <View style={styles.previewPickerContainer}>
 
                         <View style={styles.colourPickerGroup}>
-                            {/* <Text style={{fontSize: 15}}>Preview</Text> */}
                         <View style={[styles.previewBlock, {backgroundColor: entry[1].background, borderColor: entry[1].border}]}>
                             <Text style={{color: entry[1].text}}>Title</Text>
                             <Text style={{color: entry[1].text, fontSize:10, opacity: 0.5}}>Sub Text 1</Text>
@@ -112,17 +111,17 @@ export default function ThemeEntryModal(){
                             <View style={styles.pickerContainer}>
                                 <Panel1 style={{aspectRatio: 1/1, width: '100%', height: 'auto'}} />
                                 
-                                <HueSlider style={{}} />
+                                <HueSlider />
                             </View>
                         </ColorPicker>
                         </View>
                     </View>
 
-                    <FlatList fadingEdgeLength={15} style={styles.coloursContainer} contentContainerStyle={{gap: 7, padding: 10, paddingBottom: 20}}
+                    <FlatList fadingEdgeLength={15}  style={[styles.coloursContainer]} contentContainerStyle={{gap: 7}}
                         data={Array(Math.ceil(EventColors.length/3)).map((_, ind) =>  {return [ind*3, ind*3+1, ind*3+2] })}
                         initialNumToRender={9}
                         renderItem={ ({item, index}) => 
-                            <View key={index} style={{width: '100%', display: 'flex', flexDirection: 'row', justifyContent: 'space-between'}}>
+                            <View key={index} style={styles.coloursRow}>
                             <ColourButton theme={EventColors[index*3+0]} onClick={() => { setEntry([entry[0], EventColors[index*3+0]]) } } />
                             <ColourButton theme={EventColors[index*3+1]} onClick={() => { setEntry([entry[0], EventColors[index*3+1]]) } } />
                             <ColourButton theme={EventColors[index*3+2]} onClick={() => { setEntry([entry[0], EventColors[index*3+2]]) } } />
@@ -181,7 +180,13 @@ const styles = StyleSheet.create({
         paddingBottom: 3,
         borderBottomColor: '#EEE',
         borderBottomWidth: 1,
-        // elevation: 1
+    },
+
+    tabPressable: {
+        width: '100%', 
+        height: '100%', 
+        justifyContent: 'center', 
+        alignItems: 'center'
     },
 
     tab: {
@@ -209,6 +214,7 @@ const styles = StyleSheet.create({
         borderColor: "#11111155",
         width: '80%',
         minHeight: '30%',
+        paddingBottom: 15,
     },
 
     previewBlock: {
@@ -221,11 +227,9 @@ const styles = StyleSheet.create({
     },
 
     colourPickerGroup: {
-        display: 'flex', 
-        gap: 15, 
+        display: 'flex',  
         alignItems: 'center',
         justifyContent: 'center',
-        paddingBottom: 15,
         height: 'auto',
     },
 
@@ -233,7 +237,7 @@ const styles = StyleSheet.create({
         display: 'flex', 
         flexDirection: 'column', 
         gap: 10, 
-        width: 170, 
+        width: 165, 
         backgroundColor: '#FAFAFA', 
         padding: 10, 
         borderRadius: 5, 
@@ -246,6 +250,31 @@ const styles = StyleSheet.create({
         display: 'flex', 
         height: "12%",
         width: '80%',
+        elevation: 2, 
+        borderRadius: 5, 
+        backgroundColor: '#FBFBFB', 
+        borderWidth: 1, 
+        borderTopWidth: 1, 
+        borderColor: '#EEE',
+    },
+
+    coloursRow: {
+        width: '100%', 
+        display: 'flex', 
+        flexDirection: 'row', 
+        justifyContent: 'space-between', 
+        paddingHorizontal: 5
+    },
+
+    themeButtonOuter: {
+        padding: 2, 
+        borderRadius: '50%', 
+        borderWidth: 1, 
+        borderColor: '#DDD', 
+        justifyContent: 'center', 
+        alignItems: 'center', 
+        elevation: 2, 
+        backgroundColor: '#F5F5F5'
     },
 
     themeButtonMain: {
@@ -253,7 +282,7 @@ const styles = StyleSheet.create({
         aspectRatio: 1/1,
         borderRadius: '50%',
         overflow: 'hidden',
-        borderColor: '#F0F0F0',
+        borderColor: '#F5F5F5',
         borderWidth: 1,
     },
     themeButtonSecondary: {
