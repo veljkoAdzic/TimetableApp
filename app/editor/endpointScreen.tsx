@@ -18,6 +18,8 @@ export default function EndpointScreen() {
     const [loaderTimer, setLoaderTimer] = useState<number | undefined>()
 
     const handleButtonPress = async () =>{
+        if(inputValue.length == 0) return
+
         // disable button
         if (loader == loaderStates.active)
             return

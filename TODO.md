@@ -11,7 +11,7 @@
   - ~~fix input funkyness in lesson Form~~
 - ~~Add Theme Editor~~
   - ~~List locations with their colours~~
-  - ~~Remove location~~ (Not implemented and it should probably not be until further notice)
+  - ~~Remove location~~ **(Not implemented and it should probably not be until further notice)**
   - ~~Prune Theme of unused locations~~
   - ~~Edit modal with defaults and colour picker~~
 - Save/Share timetable
@@ -19,7 +19,7 @@
 
 ## Priority 2
 
-- Change loading state display to be prettier of TimetableScreen.tsx
+- ~~Change loading state display to be prettier of TimetableScreen.tsx~~
 - Settings tab
   - Toggle between location and lesson (id) theme mapping
 - Save/Share timetable
@@ -28,7 +28,7 @@
   - Export/Import from file
 - Add information modal in endpointScreen so when (?) button is pressed info is displayed
 - Add a current time line in TimetableScreen.tsx to show when in the timetable is the user currently
-- When hold pressing lesson in TimetableScreen.tsx show preview modal with more information, and when pressing shift the zindex to move up/down to show overlaping lessons
+- <u>~~When pressing lesson in TimetableScreen.tsx show preview modal with more information~~, and when hold-pressing shift the zindex to move up/down to show overlaping lessons</u>
 - ~~Make the ability to change theme in Lesson editor modal directly (no need to save and switch between drawers)~~
 - <u>Improve designs with dropshadow</u>
 - ~~Refactor editor to use context and to use newer components~~

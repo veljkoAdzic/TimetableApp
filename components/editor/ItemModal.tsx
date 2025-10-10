@@ -17,9 +17,11 @@ export default function ItemEditModal(props: {data: EventData | null, ThemeMap: 
     // state and method for editing theme with in ThemeEntryModal component
     const [editingTheme, setEditingTheme] = useState<[string, EventColorsType] | null>(null)
     function saveTheme(val: [string, EventColorsType]) {
-        if( val[0] == null || val[0].length == 0)
+        if( val[0] == null || val[0].length == 0) return
+
         setTheme(val[1])
         props.ThemeMap.set(val[0], val[1])
+        
     }
     // ~
 

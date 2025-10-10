@@ -1,4 +1,4 @@
-import { View, SafeAreaView, Text, StyleSheet } from 'react-native'
+import { View, SafeAreaView, Text, StyleSheet, ActivityIndicator } from 'react-native'
 import EventBlock from './EventBlock'
 import { EventData } from '../constants/EventTypes'
 import { EventColorsType, EventColors } from '@/constants/EventColors'
@@ -116,9 +116,9 @@ export default function Grid(props: GridProps){
 
     if(!themeLoaded){
         return (
-            <View>
-                <View style={styles.container}>
-                    <Text>Loading...</Text>
+            <View style={{alignItems: 'center', justifyContent: 'center', flex: 1}}>
+                <View style={[styles.container, { alignItems: 'center', justifyContent: 'center'}]}>
+                    <ActivityIndicator color="#1ea5ceff" size={50}/>
                 </View>
             </View>
         )

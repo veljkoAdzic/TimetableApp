@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet } from 'react-native'
+import { View, Text, StyleSheet, ActivityIndicator } from 'react-native'
 import  Grid  from '@/components/Grid'
 import { useEffect, useState, useRef } from 'react'
 import { loadData, storeData } from '@/utils/localStorage'
@@ -109,8 +109,8 @@ export default function TimetableScreen(props: {data?: EventData[], selected?: n
 
     if(loadingEvents){
         return(
-            <View>
-                <Text>Loading...</Text>
+            <View style={{flex: 1, justifyContent: 'center', alignContent: 'center'}}>
+                <ActivityIndicator color="#5856d8" size={60}/>
             </View>
         )
     }
