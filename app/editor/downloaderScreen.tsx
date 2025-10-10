@@ -10,6 +10,7 @@ import { EventColorsType, EventColors } from '@/constants/EventColors'
 import { clearStorage, loadData, storeData } from '@/utils/localStorage'
 import { ConfirmationDialog } from '@/components/ConfirmationDialog'
 import { generateID, loadThemeMap } from '@/utils/eventTools'
+import Button from '@/components/Button'
 
 export default function DownloaderPage1() {
     const router = useRouter()
@@ -51,20 +52,19 @@ export default function DownloaderPage1() {
             }
         }
 
+        // get only selected lessons
+        const final_lessons = lessons.filter((el) => { return selections.includes(el.id) })
+
         // Prune theme map to store only the ones that are needed
         const final_theme = new Map<string, EventColorsType>()
-        for (let id of selections) {
-            let less = lessons.find((el)=> {return el.id == id} )
-            let loc = less!.location
+        for (let less of final_lessons) {
+            let loc = less.location
             
             if (!final_theme.has(loc)){
                 final_theme.set(loc, tmp_theme.get(loc)!) 
             }
             
         }
-
-        // get only selected lessons
-        const final_lessons = lessons.filter((el) => { return selections.includes(el.id) })
 
         // store to async storage and redirect to root
         await clearStorage()
@@ -191,17 +191,21 @@ export default function DownloaderPage1() {
             </View>    
             
             <View style={styles.buttonsContainer}>
-            <Pressable onPress={() => { router.back() }}>
-            { ({pressed}) =>
-                <Text style={[styles.button, {backgroundColor: (pressed ? '#A0D1FF':'#80B1FF'), color: '#222'}]}>Back</Text>                
-            }
-            </Pressable>
+            <Button 
+            onPress={() => { router.back() }} 
+            buttonSyle={StyleSheet.flatten([styles.button, {color: '#222', backgroundColor: '#80B1FF'}])}
+            pressStyle={{color: '#333', backgroundColor: '#A0D1FF'}}
+            >
+                Back
+            </Button>
 
-            <Pressable onPress={() => {setOverriteModalOpen(true)}}>
-            { ({pressed}) =>
-                <Text style={[styles.button, {backgroundColor: (pressed ? '#00A000ff' : '#008000')}]}>Save</Text>
-            }
-            </Pressable>
+            <Button 
+            onPress={() => {setOverriteModalOpen(true)}} 
+            buttonSyle={StyleSheet.flatten([styles.button, {color: '#F0F0F0', backgroundColor: '#008000'}])}
+            pressStyle={{color: '#DDD', backgroundColor: '#00A000ff'}}
+            >
+                Save
+            </Button>
             </View>
            
         </View>
@@ -233,6 +237,8 @@ const styles = StyleSheet.create({
 
     drowdownStyle: {
         borderRadius: 5,
+        elevation: 4,
+        zIndex: 6,
     },
 
     selectAllPressable: {
@@ -248,6 +254,7 @@ const styles = StyleSheet.create({
         backgroundColor: 'white',
         borderLeftColor: '#8883',
         borderLeftWidth: 1,
+        elevation: 5
     },
     buttonsContainer: {
         display: 'flex',
@@ -257,11 +264,8 @@ const styles = StyleSheet.create({
         padding: 15,
     },
     button: {
-        backgroundColor: '#111',
-        color: '#F0F0F0',
         fontSize: 20,
         paddingVertical: 9,
-        paddingHorizontal: 18,
         borderRadius: 7
     }
 })

@@ -2,6 +2,7 @@ import { View, Text, TextInput, Pressable, ActivityIndicator, StyleSheet } from 
 import { useEffect, useState } from 'react'
 import { getClassList  } from '../../utils/timetableData'
 import { useRouter } from 'expo-router'
+import Button from '@/components/Button'
 
 enum loaderStates {
     inactive,
@@ -11,7 +12,7 @@ enum loaderStates {
 }
 
 export default function EndpointScreen() {
-    const [inputValue, setInputValue] = useState('http://192.168.100.18:369/api')  // TMP !!!!
+    const [inputValue, setInputValue] = useState('')
     const [loader, setLoader] = useState(loaderStates.inactive)
     const router = useRouter()
     const [loaderTimer, setLoaderTimer] = useState<number | undefined>()
@@ -31,8 +32,8 @@ export default function EndpointScreen() {
         .then((classes) => {
             if(classes.length == 0) 
                 throw "Error"; 
-
-            classes.sort((a, b) => a.label.localeCompare(b.label))
+            
+            classes.sort( (a, b) => a.label.trim().localeCompare(b.label.trim()) )
             setLoader(loaderStates.finished)
             router.push({pathname:'/editor/downloaderScreen', params: {classesList: JSON.stringify(classes), URL: inputValue}})
         })
@@ -77,27 +78,23 @@ export default function EndpointScreen() {
             </View>
             
             <View style={{display: 'flex', flexDirection: 'row', gap: 35}}>
-                <Pressable onPress={() => { router.back() }}>
-                { ({pressed}) =>
-                    <Text style={[styles.button, {backgroundColor: (pressed ? '#bad3ebff':'#9fc8eeff'), color: '#222'}]}>
-                        Back
-                        </Text>                
-                }
-                </Pressable>
+                <Button 
+                onPress={() => { router.back() }} 
+                buttonSyle={StyleSheet.flatten([styles.button, {backgroundColor: '#9fc8ee'}])} 
+                pressStyle={{backgroundColor: '#bad3eb', color: '#222'}}
+                >
+                    Back
+                </Button>
 
-
-                <Pressable onPress={ handleButtonPress } >
-                { ({pressed}) =>
-                <Text 
-                style={[styles.button, 
-                (pressed || loader == loaderStates.active) ? 
-                styles.buttonActive : 
-                styles.buttonPassive]}
+                
+                <Button 
+                onPress={ () => {handleButtonPress()} }
+                buttonSyle={StyleSheet.flatten([styles.button, styles.buttonPassive])} 
+                pressStyle={styles.buttonActive}
+                disabled={loader == loaderStates.active}
                 >
                     Get Timetable
-                </Text>
-                }
-            </Pressable>
+                </Button>
             </View>
         </View>
     )
@@ -112,10 +109,12 @@ const styles = StyleSheet.create({
     },
     input: {
         borderColor: 'rgba(0,0,0,0.5)',
+        backgroundColor: '#F5F5F5',
         borderWidth: 1,
         borderRadius: 10,
         padding: 10,
-        width: '75%'
+        width: '75%',
+        elevation: 3
     },
 
     title: {

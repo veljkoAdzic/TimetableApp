@@ -1,8 +1,7 @@
 import { Text, Pressable, StyleSheet, TextStyle } from "react-native";
 
 
-export default function Button(props: {onPress: () => void, buttonSyle?: TextStyle, pressStyle?: TextStyle, children:string }) {
-
+export default function Button(props: {onPress: () => void, buttonSyle?: TextStyle, pressStyle?: TextStyle, children:string, disabled?:boolean }) {
     const btnStyle = StyleSheet.flatten([{backgroundColor: '#9fc8eeff', color: '#222'}, props.buttonSyle || {}])
     const pressedStyle = StyleSheet.flatten([{backgroundColor: '#bad3ebff'}, props.pressStyle || {}])
 
@@ -18,7 +17,7 @@ export default function Button(props: {onPress: () => void, buttonSyle?: TextSty
                 borderRadius: 6,
                 elevation: 3
                 }, 
-                StyleSheet.flatten([btnStyle, (pressed ? pressedStyle : {} )]) 
+                StyleSheet.flatten([btnStyle, ((pressed || (props.disabled ?? false)) ? pressedStyle : {} )]) 
             ]}
             >
             {props.children}
