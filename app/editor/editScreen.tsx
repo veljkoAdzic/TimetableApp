@@ -12,6 +12,8 @@ import { ConfirmationDialog } from '@/components/ConfirmationDialog'
 import ItemEditModal from '@/components/editor/ItemModal'
 import { MaterialCommunityIcons } from '@expo/vector-icons'
 import Button from '@/components/Button'
+import { LessonEditingContext } from '@/constants/Contexts'
+import Time from '@/constants/TimeClass'
 
 interface EditorProps {
     data?: EventData[]
@@ -194,6 +196,12 @@ export default function Editor(props: EditorProps) {
                         data.filter((event) => (index != sections.length-1 && event.day == DAYS[index]) || 
                                                 (index == sections.length-1 && !DAYS.includes(event.day))
                                     )
+                        .sort((a, b) => {
+                            let A_time = new Time(a.startTime)
+                            let B_time = new Time(b.startTime)
+
+                            return (A_time.hours*100 + A_time.minutes) - (B_time.hours*100 + B_time.minutes)
+                        })
                         .map((tile, j) => {
                             return <Item key={tile.id} data={tile} theme={ThemeMap.get(tile.location)} openCallback={openEditingItem} />
                         })
@@ -222,15 +230,13 @@ export default function Editor(props: EditorProps) {
 
             
 
-
+            <LessonEditingContext.Provider value={{openItem, setOpenItem, editData, deleteElemenet, handleClose}} >
             <ItemEditModal 
             key={openItem?.id ?? 'new'} 
             data={openItem}
             ThemeMap={ThemeMap} 
-            editCallback={editData} 
-            deleteCallback={deleteElemenet} 
-            closeCallback={handleClose}
             />
+            </LessonEditingContext.Provider>
 
             
             <FlatList style={styles.scrollContainer} contentContainerStyle={{paddingBottom: 100}}
@@ -251,7 +257,16 @@ export default function Editor(props: EditorProps) {
                 <Button onPress={
                 () => {
                     // SAVE
-                    storeData('ThemeMap', JSON.stringify([...ThemeMap]))
+
+                    // Remove unused mappings
+                    let tmp = new Map()
+                    for( let [key, val] of ThemeMap.entries()){
+                        if(data.filter((val) => val.location == key).length > 0){
+                            tmp.set(key, val)
+                        }
+                    }                   
+
+                    storeData('ThemeMap', JSON.stringify([...tmp]))
                     .then(() => storeData('eventData', JSON.stringify(data)) )
                     .then(() => router.push({pathname:'/', params: {refresh: Date.now().toString()}}) )
                 }} 

@@ -2,54 +2,68 @@ import {View, Pressable, Modal, StyleSheet } from 'react-native'
 import { ConfirmationDialog } from '../ConfirmationDialog'
 import { MaterialCommunityIcons } from '@expo/vector-icons'
 import Form from './Form'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useContext } from 'react'
 import { EventData, DefaultEventData } from '@/constants/EventTypes'
 import { EventColorsType, DefaultEventColor, EventColors } from '@/constants/EventColors'
+import { LessonEditingContext, ThemeEditingContext } from '@/constants/Contexts'
+import ThemeEntryModal from '../ThemeEntryModal'
 
-export default function ItemEditModal(props: {data: EventData | null, ThemeMap: Map<string, EventColorsType>, editCallback: (data: EventData, id: number) => void, deleteCallback: (id: number) => void, closeCallback:(final: EventData | null) => void}) {
-    const [cdVisible, setCDvisible] = useState(false);
-    const [data, setData] = useState<EventData>(DefaultEventData);
-    const [theme, setTheme] = useState<EventColorsType>(DefaultEventColor)
 
-    useEffect(() => {
-        if (props.data) {
-            setData(props.data); 
-        }
-    }, [props.data]);
+export default function ItemEditModal(props: {data: EventData | null, ThemeMap: Map<string, EventColorsType>}) {
+    const [cdVisible, setCDvisible] = useState(false);  // Confirmation Dialog visibility
+    const [theme, setTheme] = useState<EventColorsType>(DefaultEventColor) // the theme of the modal that is currently in use
+    const {openItem, setOpenItem, editData, deleteElemenet, handleClose} = useContext(LessonEditingContext) // Data and methods for the current editing lesson
 
+    // state and method for editing theme with in ThemeEntryModal component
+    const [editingTheme, setEditingTheme] = useState<[string, EventColorsType] | null>(null)
+    function saveTheme(val: [string, EventColorsType]) {
+        if( val[0] == null || val[0].length == 0)
+        setTheme(val[1])
+        props.ThemeMap.set(val[0], val[1])
+    }
+    // ~
+
+    // refreshing of theme
     useEffect(() =>{
-        if(data.location.length == 0) return
+        if(openItem == null || openItem.location.length == 0) return
 
-        if (!props.ThemeMap.has(data.location)){
+        if (!props.ThemeMap.has(openItem.location)){
             const index = props.ThemeMap.size % EventColors.length
-            props.ThemeMap.set(data.location, EventColors[index])
+            props.ThemeMap.set(openItem.location, EventColors[index])
         }
-        setTheme({...props.ThemeMap.get(data.location)!})
-    }, [data.location, props.ThemeMap])
+        setTheme({...props.ThemeMap.get(openItem.location)!})
+    }, [openItem?.location, props.ThemeMap])
+    // ~
 
-
-    function setEdits(edited: EventData){ // callback for form editing
+    // callback for form editing
+    function setEdits(edited: EventData){
         if(edited.location.length != 0) {
             if (!props.ThemeMap.has(edited.location)){
                 const index = props.ThemeMap.size % EventColors.length
                 props.ThemeMap.set(edited.location, EventColors[index])        
             }
             setTheme({...props.ThemeMap.get(edited.location)!})
+            
+            setOpenItem(edited);
+            editData(edited, edited.id)
         }
-
-        setData(edited);
-        props.editCallback(edited, edited.id);
     }
+    // ~
 
     return (
-        <>        
+        <>
+        <ThemeEditingContext.Provider value={{entry: editingTheme, setEntry: setEditingTheme, saveChanges: saveTheme}}>       
+            <ThemeEntryModal /> 
+        </ThemeEditingContext.Provider>        
+
+        
+
         { cdVisible ?
             <ConfirmationDialog
             OK={()=>{
                 setCDvisible(false)
-                // setEdits(props.data!)
-                props.deleteCallback(data.id)
-                props.closeCallback(null)
+                deleteElemenet(openItem!.id)
+                handleClose(null)
             }}
             OKtext="Delete"
             Cancel={()=>{ setCDvisible(false) }}>
@@ -61,29 +75,29 @@ export default function ItemEditModal(props: {data: EventData | null, ThemeMap: 
         <Modal
         animationType="fade"
         transparent={true}
-        visible={!!props.data}
+        visible={!!openItem}
         style={{position: 'absolute', top: 0, left: 0, right:0, bottom: 0 }}
         statusBarTranslucent={true}
         onRequestClose={() => {
-            props.editCallback(data, data.id);
-            props.closeCallback(data)
+            editData(openItem!, openItem!.id)
+            handleClose(openItem)
         }}
         >
         <View style={styles.centeredView}>
             <Pressable
             style={{position: 'absolute', top: 0, left: 0, right:0, bottom: 0}}
             onPress={() => {
-                props.closeCallback(data)
+                handleClose(openItem)
             }}
             />
 
             <View style={[styles.modalView, {backgroundColor: theme.background, borderColor: theme.border}]}>
 
-            <Form data={data ?? DefaultEventData } theme={theme} editCallback={setEdits} />
+            <Form data={openItem ?? DefaultEventData } theme={theme} editCallback={setEdits} openThemeEditor={(loc: string) => {setEditingTheme([loc, theme])}} />
 
             <View style={styles.editBar}>
                 <Pressable
-                onPress={() =>{ setEdits(data); props.closeCallback(data)  }}
+                onPress={() =>{ setEdits(openItem!); handleClose(openItem) }}
                 style={styles.editBarButton}
                 >
                     <MaterialCommunityIcons name="content-save" size={28} color={theme.text} />
@@ -117,7 +131,7 @@ const styles = StyleSheet.create({
         margin: 20,
         backgroundColor: 'white',
         borderRadius: 20,
-        padding: 0,//35,
+        padding: 0,
         paddingBottom: 0,
         alignItems: 'center',
         elevation: 5,

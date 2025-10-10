@@ -8,7 +8,7 @@ import { EventColorsType } from "@/constants/EventColors";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { formatEventTitle } from "@/utils/eventTools";
 
-export default function Form(props: {data: EventData, theme: EventColorsType, editCallback: (edit: EventData) => void}){
+export default function Form(props: {data: EventData, theme: EventColorsType, editCallback: (edit: EventData) => void, openThemeEditor: (loc: string) => void}){
     const [formData, setFormData] = useState(props.data)
     const [dropdownOpen, setDropdownOpen] = useState(false);
     const [ddItems, setDdItems] = useState([
@@ -201,10 +201,12 @@ export default function Form(props: {data: EventData, theme: EventColorsType, ed
             value={formData.location}
             placeholder='Location'
             />
-            <Pressable style={styles.button} onPress={() => { 
-                console.log("Colour Change")
+            <Pressable style={[styles.button, (formErrors.includes('location'))? styles.error : {}]} onPress={() => { 
+                if (formErrors.includes('location')) return
+                saveLocation()
+                props.openThemeEditor(formData.location)
              }}>
-            <MaterialCommunityIcons name="palette" color={props.theme.text} size={24} />
+            <MaterialCommunityIcons name="palette" color={( formErrors.includes('location') ? '#444' : props.theme.text)} size={24} />
             </Pressable>
             </View>
 
