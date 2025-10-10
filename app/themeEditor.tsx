@@ -22,12 +22,14 @@ function ThemeEntry(props:{text: string, theme:EventColorsType, renameCallback:(
                         inputMode='text' 
                         style={[styles.themeEntryText, (inputValue.length == 0) ? {borderBottomColor: 'red', backgroundColor: 'rgba(255, 195, 195, 1)'} : {}]}
                         onChangeText={ (nextTxt) => setInputValue(nextTxt) }
-                        onEndEditing={() => { props.renameCallback(props.text, inputValue.trim())}}
+                        onEndEditing={() => { props.renameCallback(props.text, inputValue.trim()); setInputValue(inputValue.trim())}}
                         value={inputValue}
                          />
             
+            <View style={styles.themePreviewContainer}>
             <View style={[styles.themePreviewMain, {backgroundColor: props.theme.background}]}>
                 <View style={[styles.themePreviewSecondary, {backgroundColor: props.theme.text}]} />
+            </View>
             </View>
         </View>
     </Pressable>
@@ -191,13 +193,25 @@ const styles = StyleSheet.create({
         width: '50%',
         paddingBottom: 1,
         paddingLeft: 6,
+        borderRadius: 5
     },
+
+    themePreviewContainer: {
+        backgroundColor: '#EFEFEF',
+        padding: 2,
+        borderRadius: '50%',
+        borderWidth: 1,
+        borderColor: '#DDD',
+        elevation: 3,
+    },
+
     themePreviewMain: {
         height: 40,
         aspectRatio: 1/1,
         borderRadius: '50%',
         overflow: 'hidden',
-        elevation: 3,
+        elevation: 1,
+
     },
     themePreviewSecondary: {
         width: '150%',
@@ -205,7 +219,7 @@ const styles = StyleSheet.create({
         margin: '35%',
         transform: [{rotateZ: '45deg'}],
 
-        borderColor: '#d3d3d3d3',
+        borderColor: '#EFEFEF',
         borderWidth: 2.5,
     },
 
