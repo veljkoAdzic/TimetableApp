@@ -2,7 +2,7 @@ import { EventData } from "@/constants/EventTypes";
 import { useState, useEffect } from "react";
 import Time from "@/constants/TimeClass";
 import { View, Text, StyleSheet, Pressable, TextInput } from 'react-native'
-import DropDownPicker from 'react-native-dropdown-picker'
+import {Dropdown} from 'react-native-element-dropdown'
 import DateTimePicker from '@react-native-community/datetimepicker'
 import { EventColorsType } from "@/constants/EventColors";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
@@ -145,7 +145,7 @@ export default function Form(props: {data: EventData, theme: EventColorsType, ed
     }
 
     return (
-        <View style={{padding: 35, paddingBottom: 18}}>
+        <View style={{padding: 35, paddingBottom: 18, width: '100%'}}>
             {/* FullName TextInput */}
             <TextInput
             style={[styles.input, {color: props.theme.text}, (formErrors.includes('title'))? styles.error : {}]}
@@ -275,19 +275,34 @@ export default function Form(props: {data: EventData, theme: EventColorsType, ed
             </View>
 
             {/* Day Dropdown */}
-            <DropDownPicker 
-            open={dropdownOpen} 
+            <View style={{margin: 12, overflow: 'visible'  }} >
+            <Dropdown 
             value={dropdownValue}
-            items={ddItems}
-            setOpen={setDropdownOpen}
-            setValue={setDropdownValue}
-            onChangeValue={saveDay}
-            setItems={setDdItems}
-            style={styles.DrowdownStyle}
-            labelStyle={{color: props.theme.text}}
-            arrowIconStyle={{tintColor: props.theme.text}} // tintColor is a property, TS is weird
-            dropDownContainerStyle={{margin: 12, borderRadius: 0}}
+            data={ddItems}
+            valueField='value'
+            labelField='label'
+            onFocus={() => setDropdownOpen(true)}
+            onBlur={() => setDropdownOpen(false)}
+            onChange={(val) => {setDropdownValue(val.value); saveDay(val.value)}}
+            style={styles.DropdownStyle}
+            selectedTextStyle={{color: props.theme.text, borderRadius: 10,}}
+            iconColor={props.theme.text}
+            itemContainerStyle={{borderRadius: 10, margin: 0}}
+            keyboardAvoiding={false}
+            activeColor="#FFF3"
+            containerStyle={[styles.dropdownMenuStyle, {backgroundColor: props.theme.background}]}
+            flatListProps={{style:{}}}
+            renderItem={(item, sleected) => (
+                <Text 
+                style={ {fontSize: 14, padding: 10, color: props.theme.text} }>
+                    {item.label}
+                </Text>
+            )}
+            autoScroll={false}
+            dropdownPosition='bottom'
+            placeholder={dropdownValue}
             />            
+            </View>
         </View>
     )
 }
@@ -315,10 +330,21 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         padding: 12 
     },
-    DrowdownStyle: {
-        margin: 12,
+    DropdownStyle: {
         backgroundColor: '#FFF4',
-        borderRadius: 0
+        borderRadius: 0,
+        borderColor: '#000',
+        borderWidth: 1,
+        padding: 10,
+        margin: 0,
+    },
+    dropdownMenuStyle: {
+        margin: 0, 
+        borderWidth: 1, 
+        borderColor: '#000', 
+        height: 400,
+        padding: 3,
+        top: -37,
     },
     button: {
         borderColor: 'black', 

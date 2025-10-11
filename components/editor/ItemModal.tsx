@@ -85,7 +85,7 @@ export default function ItemEditModal(props: {data: EventData | null, ThemeMap: 
             handleClose(openItem)
         }}
         >
-        <View style={styles.centeredView}>
+        <View style={[styles.centeredView, {position: 'absolute', top: 0, left: 0, right:0, bottom: 0 }]}>
             <Pressable
             style={{position: 'absolute', top: 0, left: 0, right:0, bottom: 0}}
             onPress={() => {

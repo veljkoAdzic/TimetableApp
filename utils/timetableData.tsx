@@ -50,8 +50,19 @@ interface Lessons {
     group: string
 }
 
+let getLessonsByIDCache = new Map<string, never[] | EventData[]>()
+
 export async function getLessonsByID(rootURL: string, id: string){
     const fullURL = rootURL + API_MAP.lessons.path + "id=" + id
+
+    if (getLessonsByIDCache.has(fullURL)){
+        if(DEVELOPER_MODE){
+            console.log('[getLessonsByID]: Hit cache!')
+        }
+
+        return getLessonsByIDCache.get(fullURL)!
+    }
+
     let res = await getData(fullURL)
     .then((rawJson: Lessons[]|null) => {
         if (rawJson == null){
@@ -86,5 +97,7 @@ export async function getLessonsByID(rootURL: string, id: string){
         console.log("[getLessonsByID]:",err)
         return []
     })
+
+    getLessonsByIDCache.set(fullURL, res)
     return res
 }

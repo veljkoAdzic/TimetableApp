@@ -59,6 +59,7 @@ export default function EndpointScreen() {
 
             <TextInput 
             placeholder='link to timetable' 
+            placeholderTextColor={'#666'}
             inputMode='url' 
             style={styles.input}
             onChangeText={ (nextTxt) => setInputValue(nextTxt.trim()) }
@@ -112,6 +113,7 @@ const styles = StyleSheet.create({
     input: {
         borderColor: 'rgba(0,0,0,0.5)',
         backgroundColor: '#F5F5F5',
+        color: 'black',
         borderWidth: 1,
         borderRadius: 10,
         padding: 10,

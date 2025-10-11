@@ -1,6 +1,6 @@
 import {View, StyleSheet, Pressable, Text } from 'react-native'
 import { useRouter, useLocalSearchParams } from 'expo-router'
-import DropDownPicker from 'react-native-dropdown-picker'
+import {Dropdown} from 'react-native-element-dropdown'
 import { useEffect, useState } from 'react'
 import TimetableScreen from '@/screens/TimetableScreen'
 import { EventData } from '@/constants/EventTypes'
@@ -165,17 +165,27 @@ export default function DownloaderPage1() {
             <Text style={styles.title}>Please select lessons</Text>
 
         <View style={styles.optionsContainer}>
-            <DropDownPicker 
-            open={dropdownOpen} 
-            value={dropdownValue}
-            items={ddItems}
-            setOpen={setDropdownOpen}
-            setValue={setDropdownValue}
-            onChangeValue={onChange}
-            setItems={setDdItems}
-            style={styles.drowdownStyle}
-            containerStyle={{flexGrow: 1, width: 1}}
-            />
+
+            <View style={{flexGrow: 1}}>
+                <Dropdown 
+                value={dropdownValue}
+                data={ddItems}
+                valueField='value'
+                labelField='label'
+                onFocus={() => setDropdownOpen(true)}
+                onBlur={() => setDropdownOpen(false)}
+                onChange={(val) => {setDropdownValue(val.value); onChange(val.value)}}
+                style={[styles.drowdownStyle, (dropdownOpen) ? {borderBottomLeftRadius: 0, borderBottomRightRadius: 0} : {}]}
+                containerStyle={styles.dropdownMenuStyle}
+                itemContainerStyle={{borderRadius: 15}}
+                renderItem={(item, sleected) => (
+                    <Text style={{fontSize: 14, padding: 10}}>{item.label}</Text>
+                )}
+                autoScroll={false}
+                dropdownPosition='bottom'
+                placeholder={dropdownValue}
+                />
+            </View>
 
             <Pressable
             style={styles.selectAllPressable}
@@ -236,9 +246,23 @@ const styles = StyleSheet.create({
     },
 
     drowdownStyle: {
-        borderRadius: 5,
-        elevation: 4,
-        zIndex: 6,
+        borderRadius: 10,
+        borderColor: '#555',
+        borderWidth: 1,
+        padding: 10,
+        backgroundColor: '#FAFAFA',
+        elevation: 2,
+        margin: 0,
+    },
+    dropdownMenuStyle: {
+        margin: 0, 
+        borderWidth: 1, 
+        borderBottomLeftRadius: 10, 
+        borderBottomRightRadius: 10, 
+        borderColor: '#555', 
+        height: 200, 
+        elevation: 4, 
+        padding: 5
     },
 
     selectAllPressable: {
