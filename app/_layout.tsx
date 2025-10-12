@@ -11,17 +11,22 @@ export default function RootLayout() {
           drawerLabel: 'Timetable',
           title: 'Weekly Timetable', 
           drawerIcon: ({color, size}) => (<MaterialCommunityIcons name="table" size={size} color={color} />)
-          }}/>
+        }}/>
         <Drawer.Screen name='themeEditor' options={{
           drawerLabel: 'Edit Colours', 
           title: 'Editor for lesson colours', 
           drawerIcon: ({color, size}) => (<MaterialCommunityIcons name="palette" size={size} color={color} />)
-          }} />
+        }} />
         <Drawer.Screen name='editor' options={{
           drawerLabel: 'Edit Lessons', 
           title: 'Editor for lessons',  /* pencil table-edit layers-edit playlist-edit square-edit-outline*/
           drawerIcon: ({color, size}) => (<MaterialCommunityIcons name="square-edit-outline" size={size} color={color} />)
-          }} />
+        }} />
+        <Drawer.Screen name='ShareScreen' options={{
+          drawerLabel: 'Share/Export', 
+          title: 'Share or export timetable',
+          drawerIcon: ({color, size}) => (<MaterialCommunityIcons name="share" size={size} color={color} />)
+        }} />
 
         <Drawer.Screen name='devTools' options={{
           drawerLabel: 'Dev Tools', 
