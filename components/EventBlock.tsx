@@ -225,11 +225,11 @@ const styles = StyleSheet.create({
         paddingVertical: 5,
         paddingHorizontal: 10,
         flex: 1,
-        backgroundColor: '#FFFFFF1F',
+        backgroundColor: '#FFF3',
         borderTopLeftRadius:  5,
         borderTopRightRadius: 5,
         borderBottomLeftRadius:  3,
         borderBottomRightRadius: 3,
-        opacity: 0.9
+        // opacity: 0.9
     }
 })
