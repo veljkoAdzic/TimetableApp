@@ -1,6 +1,10 @@
-import {View, Text, StyleSheet, Pressable} from 'react-native'
+import {View, Text, StyleSheet, Pressable, ActivityIndicator} from 'react-native'
 import {useState, useEffect} from 'react'
 import { MaterialCommunityIcons } from '@expo/vector-icons'
+import { getCompressedData, encodeZ85 } from '@/utils/encoding'
+import QRCode from 'react-native-qrcode-svg'
+import { TextInput } from 'react-native-gesture-handler'
+import * as Clipboard from 'expo-clipboard'
 
 export default function ShareScreen() {
     const OPTIONS = [
@@ -10,12 +14,12 @@ export default function ShareScreen() {
     },
     {
         iconName: 'qrcode',
-        text: 'Share as QR code'
+        text: 'Share as QR code or link'
     },
-    {
-        iconName: 'link',
-        text: 'Share as URL'
-    },
+    // {
+    //     iconName: 'link',
+    //     text: 'Share as URL'
+    // },
     {
         iconName: 'file-download',
         text: 'Export as file'
@@ -24,9 +28,93 @@ export default function ShareScreen() {
 
     const [selected, setSelected] = useState(0)
 
+    const [errMsg, setErrMsg] = useState<string|null>(null)
+
+    const [QRdata, setQRdata] = useState<string|null>(null)
+    const [shareLink, setShareLink] = useState<string|null>(null)
+
+
+    useEffect(() => {
+        if(selected == 1 && QRdata == null && shareLink == null) {
+            getCompressedData()
+            .then(arrBytes => {
+                const parts: string[] = new Array(arrBytes.length)
+                for( let i = 0; i < arrBytes.length; i++){
+                    parts[i] = String.fromCharCode(arrBytes[i])
+                }
+                setShareLink('ttshare://tt.app/data/' + encodeZ85(arrBytes))
+                setQRdata(parts.join(''))
+                setErrMsg(null)
+            })
+            .catch((e) => {
+                setErrMsg(e)
+            })
+            
+        }
+    }, [selected])
+
+
     return (
         <View style={styles.container}>
-            <Text style={styles.title}>Share or export timetable</Text>
+            <Text style={styles.title}>{OPTIONS[selected].text}</Text>
+
+            { selected == 0 && errMsg == null && /* EXPORT AS IMAGE */
+                <View style={[{backgroundColor: 'lime'}, styles.mainContainer]}>
+                    <Text>IMG</Text>
+                </View>
+            }
+
+            { selected == 1 && errMsg == null && /* QR CODE */
+                <View style={styles.mainContainer}>                    
+                    { (QRdata == null && shareLink == null) ?
+                    <View style={{flex: 1, justifyContent: 'center'}}> 
+                        <ActivityIndicator color="#6139cf" size={50} /> 
+                    </View> :
+                    <>
+                    <View style={{borderRadius: 15, overflow: 'hidden', elevation: 5}}>
+                    <QRCode value={QRdata!} size={310} ecl='L' quietZone={20} />
+                    </View>
+
+                    <View style={styles.shareLinkContainer}>
+                        <TextInput 
+                        style={{backgroundColor: '#FFF', color: '#555', borderRadius: 10, padding: 10, flexShrink: 1, elevation: 3, borderWidth: 1, borderColor: '#1113' }}
+                        value={shareLink || ''}
+                        scrollEnabled
+                        selection={{start: 0}}
+                        editable={false}
+                                            
+                        />
+                        <Pressable 
+                        onPress={() => { if(shareLink) Clipboard.setStringAsync(shareLink) }}
+                        style={{overflow: 'hidden', borderRadius: '30%', backgroundColor: '#555ee4ff', elevation: 3}}
+                        > 
+                        { ({pressed}) => (
+                            <MaterialCommunityIcons 
+                            name="clipboard-outline" 
+                            size={32} 
+                            color='#EAEAEA' 
+                            style={[{padding: 5}, pressed ? { backgroundColor: '#FFF3' }: {}]} 
+                            />
+                        ) } 
+                        </Pressable>
+                    </View>
+                    </>
+                    }
+                </View>
+            }
+
+            { selected == 2 && errMsg == null && /* EXPORT AS FILE */
+                <View style={[{backgroundColor: 'yellow'}, styles.mainContainer]}>
+                    <Text>FILE</Text>
+                </View>
+            }
+
+
+            { errMsg != null &&
+                <View style={[{backgroundColor: 'pink'}, styles.mainContainer]}>
+                    <Text>{errMsg}</Text>
+                </View>
+            }
 
             <View style={styles.optionsContainer}>
 
@@ -49,31 +137,6 @@ export default function ShareScreen() {
                     </Pressable>
                 )) }
             </View>
-
-
-            { selected == 0 && /* EXPORT AS IMAGE */
-                <View style={styles.mainContainer}>
-                    <Text>IMG</Text>
-                </View>
-            }
-
-            { selected == 1 && /* QR CODE */
-                <View style={{backgroundColor: 'salmon', width: '100%', flexGrow: 1}}>
-                    <Text>QR</Text>
-                </View>
-            }
-
-            { selected == 2 && /* SHARE LINK */
-                <View style={{backgroundColor: 'salmon', width: '100%', flexGrow: 1}}>
-                    <Text>LINK</Text>
-                </View>
-            }
-
-            { selected == 3 && /* EXPORT AS FILE */
-                <View style={{backgroundColor: 'salmon', width: '100%', flexGrow: 1}}>
-                    <Text>FILE</Text>
-                </View>
-            }
             
 
         </View>
@@ -121,9 +184,17 @@ const styles = StyleSheet.create({
     },
 
     mainContainer: {
-        backgroundColor: 'salmon', 
         width: '100%', 
-        flexGrow: 1,
-        
+        flexGrow: 1, 
+        alignItems: 'center', 
+        gap: 40
+    },
+
+    shareLinkContainer: {
+        display: 'flex', 
+        flexDirection: 'row', 
+        alignItems: 'center', 
+        width: "100%", 
+        gap: 10,
     },
 })
