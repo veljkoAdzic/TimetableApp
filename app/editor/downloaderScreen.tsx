@@ -12,15 +12,25 @@ import { ConfirmationDialog } from '@/components/ConfirmationDialog'
 import { generateID, loadThemeMap } from '@/utils/eventTools'
 import Button from '@/components/Button'
 
+interface LocalSearchParamsType {
+    classesList?: string, 
+    URL?: string, 
+    sharelink?:string, 
+    previewMode?:any
+}
+
 export default function DownloaderPage1() {
     const router = useRouter()
-    const { classesList, URL }:{classesList: string, URL: string} = useLocalSearchParams()
+    const { classesList, URL, sharelink, previewMode }:LocalSearchParamsType = useLocalSearchParams()
 
-    const [ddItems, setDdItems] = useState< ({value:string, label:string})[] >(JSON.parse(classesList))
+    const [asStorage, setASstrorage] = useState<{"ThemeMap": any, "eventData": any}|null> (JSON.parse(sharelink || "null") );
+
+    const [ddItems, setDdItems] = useState< ({value:string, label:string})[]|null >(JSON.parse(classesList || "null"))
     const [dropdownOpen, setDropdownOpen] = useState(false)
-    const [dropdownValue, setDropdownValue] = useState(ddItems[0].value)
+    const [dropdownValue, setDropdownValue] = useState(ddItems ? ddItems[0].value : null)
 
     const [lessons, setLessons] = useState<EventData[]>([])
+
 
     const [selectAll, setSelectAll] = useState(false)
     const [selections, setSelections] = useState<number[]>([])
@@ -29,7 +39,7 @@ export default function DownloaderPage1() {
 
     function onChange(val: string|null) {
         if(val != null)
-            getLessonsByID(URL, val)
+            getLessonsByID(URL!, val)
             .then((res) => {
                 setLessons(res)
             })
@@ -42,6 +52,20 @@ export default function DownloaderPage1() {
     async function handleSaveOverrite() {
 
         if(selections.length == 0) return
+
+        if(asStorage) {
+            const final_lessons = lessons.filter((el) => { return selections.includes(el.id) })
+            await clearStorage()
+            .then(() => 
+            storeData('ThemeMap', JSON.stringify(asStorage["ThemeMap"]))
+            .then(() => 
+            storeData('eventData', JSON.stringify(final_lessons)) )
+            .then(() => {
+                router.dismissAll()
+                router.push({pathname:'/', params: {refresh: Date.now().toString()}})
+            } ))
+            return;
+        }
 
         // create theme map
         let tmp_theme = new Map<string, EventColorsType>(); 
@@ -82,14 +106,24 @@ export default function DownloaderPage1() {
     async function handleSaveAppend() {
         if(selections.length == 0) return
 
+        let themeMapShared = new Map<string, EventColorsType>();
+        if(asStorage && asStorage["ThemeMap"]){
+            for(let [loc, col] of asStorage["ThemeMap"])
+                themeMapShared.set(loc, col)
+        }
+
         // create theme map
         let tmp_theme = new Map<string, EventColorsType>(); 
         loadThemeMap(tmp_theme)
 
         for (let lesson of lessons){
             if(!tmp_theme.has(lesson.location) && lesson.location.length > 0){
-                const index = tmp_theme.size % EventColors.length
-                tmp_theme.set(lesson.location, EventColors[index])
+                if(themeMapShared){
+                    tmp_theme.set(lesson.location, themeMapShared.get(lesson.location)!)
+                } else {
+                    const index = tmp_theme.size % EventColors.length
+                    tmp_theme.set(lesson.location, EventColors[index])
+                }
             }
         }
 
@@ -135,7 +169,13 @@ export default function DownloaderPage1() {
     }
 
     useEffect(()=>{
-        onChange(dropdownValue)
+        if( URL && classesList)
+            onChange(dropdownValue)
+        else if(sharelink) {
+            setASstrorage(JSON.parse(sharelink))
+            setLessons(JSON.parse(sharelink)["eventData"])
+            setSelections([])
+        }
     },[])
 
     useEffect(()=>{
@@ -147,7 +187,8 @@ export default function DownloaderPage1() {
     },[selections])
 
     useEffect(() => {
-        onChange(dropdownValue)
+        if(dropdownValue != null)
+            onChange(dropdownValue)
     }, [classesList])
 
     return ( 
@@ -166,10 +207,11 @@ export default function DownloaderPage1() {
 
         <View style={styles.optionsContainer}>
 
+            { URL && classesList ?
             <View style={{flexGrow: 1}}>
                 <Dropdown 
                 value={dropdownValue}
-                data={ddItems}
+                data={ddItems!}
                 valueField='value'
                 labelField='label'
                 onFocus={() => setDropdownOpen(true)}
@@ -183,9 +225,11 @@ export default function DownloaderPage1() {
                 )}
                 autoScroll={false}
                 dropdownPosition='bottom'
-                placeholder={dropdownValue}
+                placeholder={dropdownValue || "unknown"}
                 />
-            </View>
+            </View> :
+            <Text style={{fontSize: 20}}>Shared Timetable</Text>
+            }
 
             <Pressable
             style={styles.selectAllPressable}
@@ -197,7 +241,7 @@ export default function DownloaderPage1() {
 
             
             <View style={styles.timetableContainer} >
-                <TimetableScreen key={lessons.map(l => l.id).join(',')} data={lessons} selected={selections} setSelected={setSelections}/>
+                <TimetableScreen key={lessons.map(l => l.id).join(',')} data={lessons} theme={asStorage ? asStorage["ThemeMap"] : undefined} selected={selections} setSelected={setSelections}/>
             </View>    
             
             <View style={styles.buttonsContainer}>

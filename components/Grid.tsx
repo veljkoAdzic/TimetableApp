@@ -26,7 +26,8 @@ interface GridProps extends React.ComponentProps<typeof View> {
     events: EventData[],
     previewMode?: boolean,
     selected?: number[],
-    setSelected?: (ids: number[]) => void
+    setSelected?: (ids: number[]) => void,
+    theme?: Map<string, EventColorsType>
 }
 
 const ThemeMap = new Map<string, EventColorsType>();
@@ -50,6 +51,15 @@ export default function Grid(props: GridProps){
     const loadData = () => {
         let modified = false;
         setLoaded(false);
+
+        if(props.theme){
+            for(let [loc, col] of props.theme){
+                ThemeMap.set(loc, col)
+            }
+            setLoaded(true);
+            return;
+        }
+
         loadThemeMap(ThemeMap)
         .then(() => {
             if(props.previewMode || false) ThemeMap.clear()

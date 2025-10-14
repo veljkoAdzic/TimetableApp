@@ -6,6 +6,7 @@ import { EventData } from '@/constants/EventTypes'
 import { DEVELOPER_MODE } from '@/constants/Settings'
 import { useLocalSearchParams } from 'expo-router'
 import { formatEventTitle } from '@/utils/eventTools'
+import { EventColorsType } from '@/constants/EventColors'
 
 function SideBar(){
     return(
@@ -22,7 +23,7 @@ function SideBar(){
 
 
 
-export default function TimetableScreen(props: {data?: EventData[], selected?: number[], setSelected?: (ids: number[]) => void}){
+export default function TimetableScreen(props: {data?: EventData[], selected?: number[], setSelected?: (ids: number[]) => void, theme?: Map<string, EventColorsType>}){
     const [loadingEvents, setLoadingEvents] = useState(true)
     const [events_data, setEventData] = useState<EventData[] | null>(props.data || null)
 
@@ -119,7 +120,7 @@ export default function TimetableScreen(props: {data?: EventData[], selected?: n
         <View style={styles.ttContainer}>
             <SideBar />
             <View style={styles.gridContainer}>
-                <Grid events={events_data!} previewMode={(props.data != undefined)} selected={props.selected} setSelected={props.setSelected}/>
+                <Grid events={events_data!} previewMode={(props.data != undefined)} selected={props.selected} setSelected={props.setSelected} theme={props.theme}/>
             </View>
         </View>
     )

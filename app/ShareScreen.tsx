@@ -1,10 +1,11 @@
 import {View, Text, StyleSheet, Pressable, ActivityIndicator} from 'react-native'
-import {useState, useEffect} from 'react'
+import {useState, useEffect, useCallback} from 'react'
 import { MaterialCommunityIcons } from '@expo/vector-icons'
 import { getCompressedData, encodeZ85 } from '@/utils/encoding'
 import QRCode from 'react-native-qrcode-svg'
 import { TextInput } from 'react-native-gesture-handler'
 import * as Clipboard from 'expo-clipboard'
+import { useFocusEffect } from 'expo-router'
 
 export default function ShareScreen() {
     const OPTIONS = [
@@ -26,6 +27,18 @@ export default function ShareScreen() {
     },
     ]
 
+    useFocusEffect(
+        useCallback(()=>{ // Memoising the function
+            setQRdata(null)
+            setShareLink(null)
+            setErrMsg(null)
+            setSelected(0)
+            
+            return () =>{} // must return function
+    
+        }, [])
+        );
+
     const [selected, setSelected] = useState(0)
 
     const [errMsg, setErrMsg] = useState<string|null>(null)
@@ -42,7 +55,12 @@ export default function ShareScreen() {
                 for( let i = 0; i < arrBytes.length; i++){
                     parts[i] = String.fromCharCode(arrBytes[i])
                 }
-                setShareLink('ttshare://tt.app/data/' + encodeZ85(arrBytes))
+
+                let len = arrBytes.length + ((4 - (arrBytes.length % 4)) % 4);
+                const padded = new Uint8Array(len);
+                padded.set(arrBytes);
+
+                setShareLink('ttshare://tt.app/data/' + encodeZ85(padded))
                 setQRdata(parts.join(''))
                 setErrMsg(null)
             })
