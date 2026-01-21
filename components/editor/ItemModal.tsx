@@ -81,8 +81,12 @@ export default function ItemEditModal(props: {data: EventData | null, ThemeMap: 
         style={{position: 'absolute', top: 0, left: 0, right:0, bottom: 0 }}
         statusBarTranslucent={true}
         onRequestClose={() => {
-            editData(openItem!, openItem!.id)
-            handleClose(openItem)
+            if(openItem) {
+                editData(openItem, openItem.id)
+                handleClose(openItem)
+            } else {
+                handleClose(null)
+            }
         }}
         >
         <View style={[styles.centeredView, {position: 'absolute', top: 0, left: 0, right:0, bottom: 0 }]}>

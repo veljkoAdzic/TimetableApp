@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react'
 import { getClassList  } from '../../utils/timetableData'
 import { useRouter } from 'expo-router'
 import Button from '@/components/Button'
-import { decodeZ85, decompressData } from '@/utils/encoding'
+import { decodeB94, decompressData } from '@/utils/encoding'
 
 enum loaderStates {
     inactive,
@@ -33,15 +33,15 @@ export default function EndpointScreen() {
 
         if(inputValue.startsWith('ttshare://tt.app/data/')){
 
-            let z85_data = inputValue.slice('ttshare://tt.app/data/'.length)
+            let encoded_data = inputValue.slice('ttshare://tt.app/data/'.length)
             try {
-                let decoded = decodeZ85(z85_data)
+                let decoded = decodeB94(encoded_data)
                 if(decoded == null)
                     throw new Error("Unable to decode")
 
                 let unzipped = decompressData(decoded) // Full Async Storage as JSON
 
-                console.log(unzipped)
+                // console.log(unzipped)
                 
                 router.push({pathname:'/editor/downloaderScreen', params: {sharelink: unzipped, previewMode: 1}})
 
