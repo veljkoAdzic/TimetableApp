@@ -1,8 +1,8 @@
 import {View, Text, StyleSheet, Pressable, ActivityIndicator} from 'react-native'
 import {useState, useEffect, useCallback} from 'react'
 import { MaterialCommunityIcons } from '@expo/vector-icons'
-import { getCompressedData, encodeB94 } from '@/utils/encoding'
-// import QRCode from 'react-native-qrcode-svg'
+import { getCompressedData, encodeB94, SHARE_LINK_BASE } from '@/utils/encoding'
+import QRCode from 'react-native-qrcode-svg'
 import { TextInput } from 'react-native-gesture-handler'
 import * as Clipboard from 'expo-clipboard'
 import { useFocusEffect } from 'expo-router'
@@ -17,10 +17,6 @@ export default function ShareScreen() {
         iconName: 'qrcode',
         text: 'Share as QR code or link'
     },
-    // {
-    //     iconName: 'link',
-    //     text: 'Share as URL'
-    // },
     {
         iconName: 'file-download',
         text: 'Export as file'
@@ -55,7 +51,8 @@ export default function ShareScreen() {
                 for( let i = 0; i < arrBytes.length; i++){
                     parts[i] = String.fromCharCode(arrBytes[i])
                 }
-                setShareLink('ttshare://tt.app/data/' + encodeB94(arrBytes))
+                setShareLink(SHARE_LINK_BASE + encodeB94(arrBytes))
+                setQRdata(parts.join(""))
                 setErrMsg(null)
             })
             .catch((e) => {
@@ -76,15 +73,15 @@ export default function ShareScreen() {
                 </View>
             }
 
-            { selected == 1 && errMsg == null && /* QR CODE */
-                <View style={styles.mainContainer}>                    
+            {errMsg == null && /* QR CODE */
+                <View style={[styles.mainContainer, (selected==1) ? {} : {display: 'none'}]}>                    
                     { (QRdata == null && shareLink == null) ?
                     <View style={{flex: 1, justifyContent: 'center'}}> 
                         <ActivityIndicator color="#6139cf" size={50} /> 
                     </View> :
                     <>
                     <View style={{borderRadius: 15, overflow: 'hidden', elevation: 5}}>
-                    {/* <QRCode value={QRdata!} size={310} ecl='L' quietZone={20} /> */}
+                    <QRCode value={QRdata!} size={310} ecl='L' quietZone={20} />
                     </View>
 
                     <View style={styles.shareLinkContainer}>

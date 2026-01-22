@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react'
 import { getClassList  } from '../../utils/timetableData'
 import { useRouter } from 'expo-router'
 import Button from '@/components/Button'
-import { decodeB94, decompressData } from '@/utils/encoding'
+import { decodeB94, decompressData, SHARE_LINK_BASE } from '@/utils/encoding'
 
 enum loaderStates {
     inactive,
@@ -31,9 +31,9 @@ export default function EndpointScreen() {
         }
         setLoader(loaderStates.active)
 
-        if(inputValue.startsWith('ttshare://tt.app/data/')){
+        if(inputValue.startsWith(SHARE_LINK_BASE)){
 
-            let encoded_data = inputValue.slice('ttshare://tt.app/data/'.length)
+            let encoded_data = inputValue.slice(SHARE_LINK_BASE.length)
             try {
                 let decoded = decodeB94(encoded_data)
                 if(decoded == null)

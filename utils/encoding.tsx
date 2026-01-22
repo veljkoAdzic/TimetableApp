@@ -139,6 +139,8 @@ function maxifyJSON(obj: any[]) {
     return res
 }
 
+export const SHARE_LINK_BASE = 'ttshare://tt.app/data#'
+
 export async function getCompressedData(){
     return await AsyncStorage.getAllKeys()
     .then(async (keys) => {
@@ -151,7 +153,6 @@ export async function getCompressedData(){
                     if(val == null || val == undefined) 
                         data[key] = null
                     else{
-                        console.log("[getCompressedData]:", key)
                         data[key] = JSON.parse(val) || null
                     }
                 })
