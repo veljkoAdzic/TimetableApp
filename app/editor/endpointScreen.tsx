@@ -1,6 +1,6 @@
 import { View, Text, TextInput, Pressable, ActivityIndicator, StyleSheet } from 'react-native'
-import { useEffect, useState } from 'react'
-import { getClassList  } from '../../utils/timetableData'
+import { useState } from 'react'
+import { apiInteractorFactory } from '@/utils/timetableData'
 import { useRouter } from 'expo-router'
 import Button from '@/components/Button'
 import { decodeB94, decompressData, SHARE_LINK_BASE } from '@/utils/encoding'
@@ -52,13 +52,12 @@ export default function EndpointScreen() {
             }
             return;
         }
-
-        getClassList(inputValue)
+        const APIinteractor = await apiInteractorFactory(inputValue)
+        APIinteractor.getClassList()
         .then((classes) => {
             if(classes.length == 0) 
                 throw "Error"; 
             
-            classes.sort( (a, b) => a.label.trim().localeCompare(b.label.trim()) )
             setLoader(loaderStates.finished)
             router.push({pathname:'/editor/downloaderScreen', params: {classesList: JSON.stringify(classes), URL: inputValue}})
         })

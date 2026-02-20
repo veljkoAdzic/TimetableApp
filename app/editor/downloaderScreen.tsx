@@ -1,10 +1,10 @@
 import {View, StyleSheet, Pressable, Text } from 'react-native'
 import { useRouter, useLocalSearchParams } from 'expo-router'
 import {Dropdown} from 'react-native-element-dropdown'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import TimetableScreen from '@/screens/TimetableScreen'
 import { EventData } from '@/constants/EventTypes'
-import { getLessonsByID } from '@/utils/timetableData'
+import { apiInteractable, apiInteractorFactory } from '@/utils/timetableData'
 import { MaterialCommunityIcons } from '@expo/vector-icons'
 import { EventColorsType, EventColors } from '@/constants/EventColors'
 import { clearStorage, loadData, storeData } from '@/utils/localStorage'
@@ -31,19 +31,47 @@ export default function DownloaderPage1() {
 
     const [lessons, setLessons] = useState<EventData[]>([])
 
+    const apiInteractor = useRef<apiInteractable | null>(null);
 
     const [selectAll, setSelectAll] = useState(false)
     const [selections, setSelections] = useState<number[]>([])
 
     const [overriteModalOpen, setOverriteModalOpen] = useState(false)
 
-    function onChange(val: string|null) {
-        if(val != null)
-            getLessonsByID(URL!, val)
+    const computedThemeMap = useMemo(() => {
+        const tmp = new Map<string, EventColorsType>();
+        for (let lesson of lessons) {
+            if (!tmp.has(lesson.location) && lesson.location.length > 0) {
+                const index = tmp.size % EventColors.length;
+                tmp.set(lesson.location, EventColors[index]);
+            }
+        }
+        return tmp;
+    }, [lessons]);
+
+    const themeToPass = useMemo(() => {
+        if (asStorage && asStorage.ThemeMap) {
+            // shared ThemeMap may be serialized as array of entries -> normalize to Map
+            if (Array.isArray(asStorage.ThemeMap)) return new Map(asStorage.ThemeMap)
+            if (asStorage.ThemeMap instanceof Map) return asStorage.ThemeMap
+            return new Map(Object.entries(asStorage.ThemeMap))
+        }
+        return computedThemeMap
+    }, [asStorage, computedThemeMap])
+
+    async function onChange(val: string|null) {
+        if(val != null){
+            if(apiInteractor.current == null && URL) {
+                console.log("CREATING NEW API_INTERACTOR")
+                apiInteractor.current = await apiInteractorFactory(URL)
+            }
+
+            apiInteractor.current!.getLessonsByID(val)
             .then((res) => {
                 setLessons(res)
             })
-        else
+
+        }else
             setLessons([])
 
         setSelections([])
@@ -189,7 +217,7 @@ export default function DownloaderPage1() {
     useEffect(() => {
         if(dropdownValue != null)
             onChange(dropdownValue)
-    }, [classesList])
+    }, [dropdownValue])
 
     return ( 
         <View style={styles.screenContainer}>
@@ -241,7 +269,7 @@ export default function DownloaderPage1() {
 
             
             <View style={styles.timetableContainer} >
-                <TimetableScreen key={lessons.map(l => l.id).join(',')} data={lessons} theme={asStorage ? asStorage["ThemeMap"] : undefined} selected={selections} setSelected={setSelections}/>
+                <TimetableScreen key={lessons.map(l => l.id).join(',')} data={lessons} theme={themeToPass} selected={selections} setSelected={setSelections}/>
             </View>    
             
             <View style={styles.buttonsContainer}>

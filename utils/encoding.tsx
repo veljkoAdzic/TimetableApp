@@ -5,8 +5,8 @@ import { DAYS, EventData } from "@/constants/EventTypes";
 import { EventColorsType } from "@/constants/EventColors";
 import { generateID } from "./eventTools";
 
-type RGBBytes = Uint8Array;   // length = 3
-type PackedTime = Uint8Array; // length = 3
+type RGBBytes = string;//Uint8Array;   // length = 3
+type PackedTime = string;//Uint8Array; // length = 3
 type TimeTuple = number[] | [number, number];
 
 type ThemeMapEntry = [string, EventColorsType];
@@ -55,11 +55,11 @@ function HexColourToB94(hex:string):RGBBytes {
         parseInt(hex.slice(4,6), 16)
     ]);
 
-    return b //encodeB94(b);
+    return encodeB94(b);
 }
 
-function B94ToHexColour(bytes:RGBBytes):string {
-    // let bytes = decodeB94(cmp);
+function B94ToHexColour(rgb:RGBBytes):string {
+    let bytes = decodeB94(rgb);
     
     return '#' + Array.from(bytes)
             .map(b => b.toString(16).padStart(2, '0'))
@@ -82,13 +82,13 @@ function bitPackTime(startTime: TimeTuple, endTime: TimeTuple, day:string):Packe
     packed_bytes[1] = (packed_day >> 8) & 0xff;
     packed_bytes[2] = packed_day & 0xff;
 
-    return packed_bytes //encodeB94(packed_bytes)
+    return encodeB94(packed_bytes)
 }
 
-function bitUnpackTime(data:PackedTime) {
+function bitUnpackTime(encoded:PackedTime) {
     // xDDD_SSSS-SSSS_SSOO-OOOO_OOOO
     //  DAY ^--START---^^--OFFSET--^
-    // const data = decodeB94(encoded);
+    const data = decodeB94(encoded);
     const packed_day = (data[0] << 16) | (data[1] << 8) | data[2];
 
     const dayInd = (packed_day >> 20) & 0x07
@@ -184,164 +184,6 @@ function maxifyJSON(obj: MinifiedJSON):MaximisedJSON {
     return res
 }
 
-const NULL_STR = 0;
-function serialize(data:MinifiedJSON){
-    const strMem = new Map<string, number>();
-    const strBank: number[] = [];
-    const encoder = new TextEncoder();
-    let strBankIndex = 1;
-
-    function packString(s: string): number {
-        if (strMem.has(s)) {
-        return strMem.get(s)!;
-        }
-
-        const encoded = encoder.encode(s);
-        if (encoded.length > 0xff) {
-        throw new Error(`'${s}' too long`);
-        }
-
-        const index = strBankIndex;
-        strBankIndex += 1;
-        strMem.set(s, index);
-
-        // append length and bytes to string bank
-        strBank.push(encoded.length);
-        for (let i = 0; i < encoded.length; i++) {
-        strBank.push(encoded[i]);
-        }
-
-        return index;
-    }
-    const [events, colours]  = data
-
-    const buff:number[] = []
-
-    buff.push(Math.min(events.length , 255))
-    buff.push(Math.min(colours.length, 255))
-
-    for(let [loc, bg, txt] of colours){
-        buff.push(packString(loc));
-        buff.push(bg[0], bg[1], bg[2]);
-        buff.push(txt[0], txt[1], txt[2]);
-    }
-
-    for(let lesson of events) {
-        const dt = lesson[0];
-        if (dt.length !== 3)
-            throw new Error("DAY_TIME must be length 3");
-
-        buff.push(dt[0], dt[1], dt[2]);
-        
-        for (let i = 1; i < 5; i++) 
-          buff.push( packString(lesson[i] as string) );
-
-        if(lesson.length > 5)
-            buff.push(packString(lesson[5] as string))
-        else 
-            buff.push(NULL_STR)
-    }
-
-    // append string bank
-    for (let i = 0; i < strBank.length; i++) 
-        buff.push(strBank[i]);
-
-    return [Uint8Array.from(buff), Uint8Array.from(strBank)];
-}
-
-function deserialize(buffer:Uint8Array):MinifiedJSON {
-    const decoder = new TextDecoder();
-    let offset = 0;
-
-    const lessonLen = buffer[offset++];
-    const colourLen = buffer[offset++];
-
-    // unpack colours
-    const coloursRaw:{loc:number, bg:RGBBytes, txt:RGBBytes}[] = []
-
-    for (let i = 0; i < colourLen; i++) {
-        const loc = buffer[offset++];
-
-        const bg = buffer.slice(offset, offset+3);
-        offset += 3;
-
-        const txt = buffer.slice(offset, offset+3);
-        offset += 3;
-
-        coloursRaw.push({ loc, bg, txt });
-    }
-
-    // unpack lessons
-    const lessonsRaw: {dt: PackedTime, strIndexes: number[]}[] = [];
-
-    for(let i = 0; i < lessonLen; i++) {
-        const dt = buffer.slice(offset, offset+3);
-        offset += 3;
-
-        const strIndexes = [
-            buffer[offset++], // location
-            buffer[offset++], // shortTitle
-            buffer[offset++], // teacher
-            buffer[offset++], // title
-            buffer[offset++]  // group
-        ];
-
-        lessonsRaw.push({dt, strIndexes})
-    }
-
-    // Reading string bank
-    const strBank = buffer.slice(offset);
-    const strTable: string[] = [];
-
-    let sbOffset = 0, strIndex = 0;
-
-    while( sbOffset < strBank.length) {
-        const len = strBank[sbOffset++];
-        const strBytes = strBank.slice(sbOffset, sbOffset+len);
-
-        sbOffset += len;
-
-        strTable[strIndex++] = decoder.decode(strBytes);
-    }
-
-    function unpackString(index: number): string {
-        if (index === NULL_STR) return "";
-        return strTable[index-1];
-    }
-
-    // rebuilding JSON
-    const lessons:MinifiedLesson[] = []
-    const colours:MinifiedColour[] = []
-
-    for(let {loc, bg, txt} of coloursRaw){
-        colours.push([
-            unpackString(loc),
-            bg,
-            txt
-        ]);
-    }
-
-    for(let {dt, strIndexes} of lessonsRaw) {
-        let unpacked = strIndexes.map(unpackString)
-        let base:MinifiedLesson = [
-           dt,
-            unpackString(strIndexes[0]),
-            unpackString(strIndexes[1]),
-            unpackString(strIndexes[2]),
-            unpackString(strIndexes[3]),
-            unpackString(strIndexes[4])
-        ];
-
-        if(strIndexes[5] != NULL_STR)
-            base.push(unpackString(strIndexes[5]))
-
-        lessons.push(base)
-    }
-
-    return [lessons, colours]
-
-}
-
 export const SHARE_LINK_BASE = 'ttshare://tt.app/data#'
 
 export async function getCompressedData(){
@@ -366,21 +208,26 @@ export async function getCompressedData(){
 
     })
     .then((data) => {
-        const [serial, dict] = serialize(minifyJSON(data))
-        // console.log(serial)
-        return pako.deflate( serial, {level: 9}) 
+        return pako.deflate( JSON.stringify( minifyJSON(data) ), {level: 9}) 
     })
 
 }
 
 
 export function decompressData(bytes:Uint8Array ){
-    let unzipped = pako.inflate(bytes); 
+    // let unzipped = pako.inflate(bytes); 
     // let miniJson =  new TextDecoder().decode(unzipped)
     // return JSON.stringify(maxifyJSON(JSON.parse(miniJson)))
-    const des = deserialize(unzipped)
-    // console.log(JSON.stringify( maxifyJSON( des ) ))
-    return JSON.stringify( maxifyJSON( des ) )
+    for (let trim = 0; trim < 4; trim++) {
+        try {
+            const arr = trim === 0 ? bytes : bytes.slice(0, bytes.length - trim);
+            let unzipped = pako.inflate(arr);
+            let miniJson =  new TextDecoder().decode(unzipped)
+            return JSON.stringify(maxifyJSON(JSON.parse(miniJson)))
+        } catch (e) {
+            if (trim === 3) throw e;
+        }
+    }
 }
 
 //// B94 ENCODING ////
