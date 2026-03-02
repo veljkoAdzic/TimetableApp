@@ -43,22 +43,9 @@ export const ConfirmationDialog = (props: ConfirmDialogProps) => {
                     <Text style={styles.modalText}>{props.children}</Text>
                     
                     <View style={styles.btnContainer}>
-                        {/* <Pressable style={{padding: 10}}
-                            onPress={() => { props.Cancel()  }}>
-                                <Text style={[styles.button, {backgroundColor: 'red'}, props.CancelStyle]}>
-                                    {props.CancelText || "Cancel"}
-                                    </Text>
-                        </Pressable> */}
-
                         <Button onPress={props.Cancel} buttonSyle={finalCancelStyle} pressStyle={{backgroundColor: '#F22'}}>{props.CancelText || "Cancel"}</Button>
 
                         <Button onPress={props.OK} buttonSyle={finalOKStyle} pressStyle={{backgroundColor: '#30A030'}} >{props.OKtext || "OK"}</Button>
-                        {/* <Pressable style={{padding: 10}}
-                            onPress={() => { props.OK()  }}>
-                                <Text style={finalOKStyle}>
-                                    {props.OKtext || "OK"}
-                                    </Text>
-                        </Pressable> */}
                     </View>
                 </View>
             </View>

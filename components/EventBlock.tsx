@@ -66,8 +66,6 @@ export default function EventBlock(props: EventBlockProps){
 
     const toggleSelection = () => {
       if(props.selectable && props.selctCallback){
-        // setSelected(!selected)
-        // console.log("ress!")
         props.selctCallback(props.data.id);
       }
     }

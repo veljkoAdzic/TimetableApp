@@ -191,18 +191,6 @@ export default function Form(props: {data: EventData, theme: EventColorsType, au
 
             {/* Location TextInput */}
             <View style={{flexDirection: 'row'}}>
-            {/* <TextInput
-            style={[styles.input, {color: props.theme.text, flexGrow: 1}, (formErrors.includes('location'))? styles.error : {}]}
-            onChangeText={(location) => { 
-                let tmp = {...formData, location}
-                setFormData(tmp)
-            }
-            }
-            onEndEditing={ saveLocation }
-            value={formData.location}
-            placeholder='Location'
-            /> */}
-
             <DropdownTextInput
             locations={props.autofillLocations}
             style={[styles.input, {color: props.theme.text, flexGrow: 1}, (formErrors.includes('location'))? styles.error : {}]}

@@ -273,7 +273,6 @@ export default function DevScreen(){
                 onPress={ () =>{
                     listStoredData()
                     .then((table) =>{
-                        //console.log(table)
                         setasData(table)
                     })
                 } }

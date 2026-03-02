@@ -4,6 +4,7 @@ import { apiInteractorFactory } from '@/utils/timetableData'
 import { useRouter } from 'expo-router'
 import Button from '@/components/Button'
 import { decodeB94, decompressData, SHARE_LINK_BASE } from '@/utils/encoding'
+import { DEVELOPER_MODE } from '@/constants/Settings'
 
 enum loaderStates {
     inactive,
@@ -47,7 +48,8 @@ export default function EndpointScreen() {
 
                 setLoader(loaderStates.finished)
             } catch (e) {
-                console.log("ERRor: " + e)
+                if(DEVELOPER_MODE)
+                    console.log("ERRor: " + e)
                 setLoader(loaderStates.failed)
             }
             return;

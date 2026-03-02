@@ -1,8 +1,8 @@
 /*
-    COnstants for enviormental and internal settings.
+    Constants for enviormental and internal settings.
 */
 
-export const DEVELOPER_MODE = true;
+export const DEVELOPER_MODE = false;
 
 export const API_MAP = {
     classList: {

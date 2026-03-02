@@ -11,6 +11,7 @@ import { clearStorage, loadData, storeData } from '@/utils/localStorage'
 import { ConfirmationDialog } from '@/components/ConfirmationDialog'
 import { generateID, loadThemeMap } from '@/utils/eventTools'
 import Button from '@/components/Button'
+import { DEVELOPER_MODE } from '@/constants/Settings'
 
 interface LocalSearchParamsType {
     classesList?: string, 
@@ -62,7 +63,8 @@ export default function DownloaderPage1() {
     async function onChange(val: string|null) {
         if(val != null){
             if(apiInteractor.current == null && URL) {
-                console.log("CREATING NEW API_INTERACTOR")
+                if(DEVELOPER_MODE)
+                    console.log("CREATING NEW API_INTERACTOR")
                 apiInteractor.current = await apiInteractorFactory(URL)
             }
 
