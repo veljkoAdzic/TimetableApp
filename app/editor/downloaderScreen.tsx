@@ -146,7 +146,7 @@ export default function DownloaderPage1() {
 
         for (let lesson of lessons){
             if(!tmp_theme.has(lesson.location) && lesson.location.length > 0){
-                if(themeMapShared){
+                if(themeMapShared.has(lesson.location)){
                     tmp_theme.set(lesson.location, themeMapShared.get(lesson.location)!)
                 } else {
                     const index = tmp_theme.size % EventColors.length

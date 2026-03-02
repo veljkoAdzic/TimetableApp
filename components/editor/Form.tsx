@@ -7,8 +7,9 @@ import DateTimePicker from '@react-native-community/datetimepicker'
 import { EventColorsType } from "@/constants/EventColors";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { formatEventTitle } from "@/utils/eventTools";
+import DropdownTextInput from "./DropdownTextInput";
 
-export default function Form(props: {data: EventData, theme: EventColorsType, editCallback: (edit: EventData) => void, openThemeEditor: (loc: string) => void}){
+export default function Form(props: {data: EventData, theme: EventColorsType, autofillLocations:string[], editCallback: (edit: EventData) => void, openThemeEditor: (loc: string) => void}){
     const [formData, setFormData] = useState(props.data)
     const [dropdownOpen, setDropdownOpen] = useState(false);
     const [ddItems, setDdItems] = useState([
@@ -190,7 +191,7 @@ export default function Form(props: {data: EventData, theme: EventColorsType, ed
 
             {/* Location TextInput */}
             <View style={{flexDirection: 'row'}}>
-            <TextInput
+            {/* <TextInput
             style={[styles.input, {color: props.theme.text, flexGrow: 1}, (formErrors.includes('location'))? styles.error : {}]}
             onChangeText={(location) => { 
                 let tmp = {...formData, location}
@@ -200,6 +201,19 @@ export default function Form(props: {data: EventData, theme: EventColorsType, ed
             onEndEditing={ saveLocation }
             value={formData.location}
             placeholder='Location'
+            /> */}
+
+            <DropdownTextInput
+            locations={props.autofillLocations}
+            style={[styles.input, {color: props.theme.text, flexGrow: 1}, (formErrors.includes('location'))? styles.error : {}]}
+            theme={props.theme}
+            onChangeText={(location) => { 
+                let tmp = {...formData, location}
+                setFormData(tmp)
+            }
+            }
+            onLocationSave={ saveLocation }
+            value={formData.location}
             />
             <Pressable style={[styles.button, (formErrors.includes('location'))? styles.error : {}]} onPress={() => { 
                 if (formErrors.includes('location')) return

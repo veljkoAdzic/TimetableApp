@@ -99,7 +99,13 @@ export default function ItemEditModal(props: {data: EventData | null, ThemeMap: 
 
             <View style={[styles.modalView, {backgroundColor: theme.background, borderColor: theme.border}]}>
 
-            <Form data={openItem ?? DefaultEventData } theme={theme} editCallback={setEdits} openThemeEditor={(loc: string) => {setEditingTheme([loc, theme])}} />
+            <Form 
+            data={openItem ?? DefaultEventData } 
+            theme={theme} 
+            editCallback={setEdits} 
+            openThemeEditor={(loc: string) => {setEditingTheme([loc, theme])}} 
+            autofillLocations={[...props.ThemeMap.keys()]}
+            />
 
             <View style={styles.editBar}>
                 <Pressable

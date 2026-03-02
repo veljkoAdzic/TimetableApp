@@ -127,7 +127,10 @@ export async function getRawJson(){
 
     const gtvd = await gtvdRes.json();
     const timetables:timetableMetadata[] = gtvd.r.regular.timetables.filter( (a:timetableMetadata) => !a.hidden);
-    const default_num = timetables.sort((a, b) => b.year - a.year)[0].tt_num
+    const default_num = timetables
+    .sort((a, b) => b.tt_num.localeCompare(a.tt_num))
+    .sort((a, b) => b.datefrom.localeCompare(a.datefrom))
+    [0].tt_num
 
 
     // 3
